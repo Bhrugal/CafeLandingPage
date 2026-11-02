@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\css\\style.css",
+      "PackagePath": "staticwebassets\\css\\style.css"
+    },
+    {
+      "Id": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\js\\main.js",
+      "PackagePath": "staticwebassets\\js\\main.js"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.CafeLandingPage.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.CafeLandingPage.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.build.CafeLandingPage.props",
+      "PackagePath": "build\\CafeLandingPage.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildMultiTargeting.CafeLandingPage.props",
+      "PackagePath": "buildMultiTargeting\\CafeLandingPage.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildTransitive.CafeLandingPage.props",
+      "PackagePath": "buildTransitive\\CafeLandingPage.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

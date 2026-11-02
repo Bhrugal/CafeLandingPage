@@ -383,6 +383,18 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+@keyframes cartBadgeBounce {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.45) rotate(-8deg); }
+  70% { transform: scale(0.9) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.cart-badge.bounce {
+  animation: cartBadgeBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* ==========================================================================
@@ -1468,6 +1480,22 @@ body.dark-theme .map-wrapper iframe {
   gap: 10px;
 }
 
+.btn-clear-cart {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.btn-clear-cart:hover {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.12);
+}
+
 .btn-close-drawer {
   background: transparent;
   border: none;
@@ -1475,10 +1503,85 @@ body.dark-theme .map-wrapper iframe {
   font-size: 1.4rem;
   cursor: pointer;
   transition: var(--transition);
+  padding: 4px;
 }
 
 .btn-close-drawer:hover {
   color: var(--color-gold);
+}
+
+/* Dining Option Switcher in Drawer */
+.drawer-dining-bar {
+  padding: 12px 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dining-pill-group {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+}
+
+.dining-pill {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 7px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.dining-pill:hover {
+  color: var(--text-primary);
+}
+
+.dining-pill.active {
+  background: var(--color-gold);
+  color: #110e0c;
+  box-shadow: 0 2px 8px rgba(224, 169, 109, 0.35);
+}
+
+/* Free Perk Milestone Bar */
+.cart-perk-container {
+  padding: 14px 24px 8px 24px;
+  background: rgba(224, 169, 109, 0.05);
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.cart-perk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.cart-perk-progress {
+  height: 7px;
+  background: var(--bg-card);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.cart-perk-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-gold), #ffd399);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
 }
 
 .cart-drawer-body {
@@ -1625,6 +1728,174 @@ body.dark-theme .map-wrapper iframe {
   color: var(--color-gold);
   font-family: var(--font-serif);
   font-size: 1.35rem;
+}
+
+/* Fly to Cart Animation Element */
+.flying-cart-clone {
+  position: fixed;
+  z-index: 99999;
+  border-radius: 50%;
+  object-fit: cover;
+  pointer-events: none;
+  box-shadow: 0 8px 30px rgba(224, 169, 109, 0.7);
+  border: 2px solid var(--color-gold);
+  transition: all 0.75s cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+/* Modal Quantity Stepper & Instructions */
+.modal-qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.btn-modal-qty {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  width: 34px;
+  height: 34px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-modal-qty:hover {
+  background: rgba(224, 169, 109, 0.2);
+  color: var(--color-gold);
+}
+
+.modal-qty-val {
+  padding: 0 14px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.modal-notes-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 52px;
+}
+
+.modal-notes-input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+}
+
+/* Checkout Items Preview */
+.checkout-items-preview {
+  max-height: 165px;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.checkout-item-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.85rem;
+}
+
+.checkout-item-line:last-child {
+  border-bottom: none;
+}
+
+/* Floating Sticky Cart Pill */
+.floating-cart-pill {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--color-gold);
+  padding: 8px 16px 8px 12px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(224, 169, 109, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 1030;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.floating-cart-pill.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.floating-cart-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(224, 169, 109, 0.15);
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 1.05rem;
+}
+
+.floating-cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--color-gold);
+  color: #110e0c;
+  font-size: 0.68rem;
+  font-weight: 800;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-cart-subtotal {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+.floating-cart-cta-btn {
+  background: var(--color-gold);
+  color: #110e0c;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.floating-cart-pill:hover .floating-cart-cta-btn {
+  background: #ffffff;
+  transform: translateX(2px);
 }
 
 /* ==========================================================================
@@ -1801,6 +2072,24 @@ body.light-theme .btn-close-modal {
   border-left: 4px solid var(--color-gold);
 }
 
+.btn-toast-action {
+  background: rgba(224, 169, 109, 0.2);
+  border: 1px solid var(--color-gold);
+  color: var(--color-gold);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.btn-toast-action:hover {
+  background: var(--color-gold);
+  color: #120b08;
+}
+
 @keyframes toastSlideIn {
   from { transform: translateX(-50px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -1883,3 +2172,60 @@ body.light-theme .btn-close-modal {
     max-width: 100%;
   }
 }
+
+/* ==========================================================================
+   LIVE ORDERS DASHBOARD & STATUS BADGES
+   ========================================================================== */
+
+.badge-order-status {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.badge-status-pending {
+  background: rgba(224, 169, 109, 0.18);
+  color: var(--color-gold);
+  border: 1px solid rgba(224, 169, 109, 0.4);
+}
+
+.badge-status-brewing {
+  background: rgba(13, 202, 240, 0.18);
+  color: #0dcaf0;
+  border: 1px solid rgba(13, 202, 240, 0.4);
+}
+
+.badge-status-completed {
+  background: rgba(25, 135, 84, 0.18);
+  color: #20c997;
+  border: 1px solid rgba(25, 135, 84, 0.4);
+}
+
+.badge-status-cancelled {
+  background: rgba(220, 53, 69, 0.18);
+  color: #ea868f;
+  border: 1px solid rgba(220, 53, 69, 0.4);
+}
+
+.order-items-snippet {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  max-width: 280px;
+}
+
+.order-ref-pill {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--color-gold);
+  background: rgba(224, 169, 109, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px dashed var(--border-color);
+}
+

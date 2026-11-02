@@ -45,6 +45,12 @@
           <i class="fa-solid fa-moon" id="themeIcon"></i>
         </button>
 
+        <!-- Live Orders Trigger Button -->
+        <button id="openOrdersBtn" class="cart-toggle-btn me-1" aria-label="View Live Orders" title="Database Live Orders">
+          <i class="fa-solid fa-receipt"></i>
+          <span class="d-none d-sm-inline">Orders</span>
+        </button>
+
         <!-- Cart Trigger Button -->
         <button id="openCartBtn" class="cart-toggle-btn" aria-label="View Shopping Cart">
           <i class="fa-solid fa-bag-shopping"></i>
@@ -89,6 +95,11 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#contact">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-warning fw-semibold" href="/swagger" target="_blank" title="REST API Documentation">
+              <i class="fa-solid fa-code me-1"></i>API Docs
+            </a>
           </li>
         </ul>
       </div>
@@ -821,9 +832,40 @@
         <i class="fa-solid fa-bag-shopping" style="color: var(--color-gold);"></i>
         <span>Your Order (<span id="cartDrawerCount">0</span>)</span>
       </h4>
-      <button class="btn-close-drawer" id="closeCartBtn" aria-label="Close Cart">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn-clear-cart" id="clearCartBtn" title="Clear all items in cart">
+          <i class="fa-regular fa-trash-can"></i>
+        </button>
+        <button class="btn-close-drawer" id="closeCartBtn" aria-label="Close Cart">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dining Option Tabs in Drawer -->
+    <div class="drawer-dining-bar">
+      <div class="dining-pill-group">
+        <button type="button" class="dining-pill active" data-type="takeaway">
+          <i class="fa-solid fa-bag-shopping me-1"></i> Takeaway
+        </button>
+        <button type="button" class="dining-pill" data-type="dinein">
+          <i class="fa-solid fa-mug-hot me-1"></i> Dine-In
+        </button>
+        <button type="button" class="dining-pill" data-type="curbside">
+          <i class="fa-solid fa-car me-1"></i> Curbside
+        </button>
+      </div>
+    </div>
+
+    <!-- Free Perk Milestone Progress -->
+    <div class="cart-perk-container" id="cartPerkBox">
+      <div class="cart-perk-header">
+        <span id="perkStatusText"><i class="fa-solid fa-gift text-warning me-1"></i> Add $10.00 for a Free Butter Croissant!</span>
+        <span class="text-warning fw-bold" id="perkProgressPct">0%</span>
+      </div>
+      <div class="cart-perk-progress">
+        <div class="cart-perk-bar" id="cartPerkBar" style="width: 0%;"></div>
+      </div>
     </div>
 
     <div class="cart-drawer-body" id="cartItemsContainer">
@@ -831,6 +873,14 @@
     </div>
 
     <div class="cart-drawer-footer" id="cartDrawerFooter">
+      <!-- Quick coupon hint chips -->
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <small class="text-secondary"><i class="fa-solid fa-tag text-warning me-1"></i> Available Promo:</small>
+        <button type="button" class="badge-tag badge-gold border-0 py-1 px-2" id="quickApplyHaven10" title="Click to apply promo code" style="cursor: pointer; font-size: 0.72rem;">
+          HAVEN10 (10% OFF)
+        </button>
+      </div>
+
       <!-- Coupon input -->
       <div class="cart-coupon-wrap">
         <input type="text" id="cartCouponInput" class="cart-coupon-input" placeholder="Promo Code (HAVEN10)">
@@ -865,7 +915,7 @@
        QUICK VIEW / ITEM CUSTOMIZER MODAL
        ========================================================================= -->
   <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title font-serif fw-bold" id="quickViewModalTitle">Customize Item</h5>
@@ -874,11 +924,21 @@
         <div class="modal-body p-4" id="quickViewBody">
           <!-- Dynamic details injected by JS -->
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-luxury-outline" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn-luxury-gold" id="modalAddToCartBtn">
-            <i class="fa-solid fa-cart-plus me-1"></i> Add to Order
-          </button>
+        <div class="modal-footer d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <span class="small text-secondary fw-semibold">Quantity:</span>
+            <div class="modal-qty-stepper">
+              <button type="button" class="btn-modal-qty" id="modalQtyDec" aria-label="Decrease quantity">-</button>
+              <span class="modal-qty-val" id="modalQtyVal">1</span>
+              <button type="button" class="btn-modal-qty" id="modalQtyInc" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn-luxury-outline" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn-luxury-gold" id="modalAddToCartBtn">
+              <i class="fa-solid fa-cart-plus me-1"></i> <span id="modalAddBtnLabel">Add to Order — $0.00</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -888,57 +948,85 @@
        CHECKOUT MODAL
        ========================================================================= -->
   <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title font-serif fw-bold" id="checkoutModalTitle">Complete Your Order</h5>
           <button type="button" class="btn-close btn-close-modal" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
+          <!-- Itemized order review preview -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="small text-secondary fw-bold text-uppercase" style="letter-spacing: 0.5px;">Order Summary</span>
+              <span class="badge-tag badge-gold" id="checkoutDiningBadge">Takeaway</span>
+            </div>
+            <div class="checkout-items-preview" id="checkoutItemsList">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+
           <form id="checkoutForm">
-            <div class="mb-3">
-              <label class="form-label">Full Name *</label>
-              <input type="text" class="form-control" id="orderCustName" placeholder="Your Name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Phone / WhatsApp *</label>
-              <input type="tel" class="form-control" id="orderCustPhone" placeholder="+61 400 000 000" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Pickup Time Slot</label>
-              <select class="form-select" id="orderPickupTime">
-                <option value="ASAP (15-20 mins)">ASAP (15-20 mins)</option>
-                <option value="In 30 minutes">In 30 minutes</option>
-                <option value="In 45 minutes">In 45 minutes</option>
-                <option value="In 1 hour">In 1 hour</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Payment Option</label>
-              <div class="custom-radio-group">
-                <div class="custom-radio-btn">
-                  <input type="radio" name="payOption" id="payCounter" value="Pay at Pickup Counter" checked>
-                  <label for="payCounter"><i class="fa-solid fa-shop me-1"></i> Pay at Counter</label>
-                </div>
-                <div class="custom-radio-btn">
-                  <input type="radio" name="payOption" id="payApple" value="Apple / Google Pay">
-                  <label for="payApple"><i class="fa-brands fa-apple me-1"></i> Digital Wallet</label>
-                </div>
-                <div class="custom-radio-btn">
-                  <input type="radio" name="payOption" id="payCard" value="Credit Card">
-                  <label for="payCard"><i class="fa-solid fa-credit-card me-1"></i> Card</label>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" id="orderCustName" placeholder="Your Name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Phone / WhatsApp *</label>
+                <input type="tel" class="form-control" id="orderCustPhone" placeholder="+61 400 000 000" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Email Address (Optional for e-Receipt)</label>
+                <input type="email" class="form-control" id="orderCustEmail" placeholder="e.g. yourname@example.com">
+              </div>
+
+              <!-- Dining dynamic field -->
+              <div class="col-12" id="checkoutDiningFieldWrap">
+                <label class="form-label" id="checkoutDiningLabel">Pickup Time Slot</label>
+                <select class="form-select" id="orderPickupTime">
+                  <option value="ASAP (15-20 mins)">ASAP (15-20 mins)</option>
+                  <option value="In 30 minutes">In 30 minutes</option>
+                  <option value="In 45 minutes">In 45 minutes</option>
+                  <option value="In 1 hour">In 1 hour</option>
+                </select>
+                <input type="text" class="form-control d-none" id="orderTableNumber" placeholder="e.g. Table #12 or Indoor Lounge">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Special Requests / Barista Notes</label>
+                <input type="text" class="form-control" id="orderNotesInput" placeholder="e.g. Extra hot, napkins, paper cup...">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Payment Method</label>
+                <div class="custom-radio-group">
+                  <div class="custom-radio-btn">
+                    <input type="radio" name="payOption" id="payCounter" value="Pay at Pickup Counter" checked>
+                    <label for="payCounter"><i class="fa-solid fa-shop me-1"></i> Pay at Counter</label>
+                  </div>
+                  <div class="custom-radio-btn">
+                    <input type="radio" name="payOption" id="payApple" value="Apple / Google Pay">
+                    <label for="payApple"><i class="fa-brands fa-apple me-1"></i> Digital Wallet</label>
+                  </div>
+                  <div class="custom-radio-btn">
+                    <input type="radio" name="payOption" id="payCard" value="Credit Card">
+                    <label for="payCard"><i class="fa-solid fa-credit-card me-1"></i> Card</label>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="p-3 mb-3 rounded border" style="background: var(--bg-card); border-color: var(--border-color) !important;">
-              <div class="d-flex justify-content-between small text-secondary mb-1">
-                <span>Order Total:</span>
-                <span class="fw-bold text-light" id="checkoutOrderTotal">$0.00</span>
+
+            <div class="p-3 my-3 rounded border" style="background: var(--bg-card); border-color: var(--border-color) !important;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-secondary small">Total Payable:</span>
+                <span class="fw-bold text-warning font-serif fs-5" id="checkoutOrderTotal">$0.00</span>
               </div>
-              <small class="text-muted">Freshly brewed and packed for your arrival.</small>
+              <small class="text-muted d-block"><i class="fa-solid fa-clock me-1"></i> Freshly prepared by our baristas upon order placement.</small>
             </div>
-            <button type="submit" class="btn-luxury-gold w-100 py-3">
-              <i class="fa-solid fa-circle-check me-1"></i> Place Order Now
+
+            <button type="submit" class="btn-luxury-gold w-100 py-3" id="submitOrderBtn">
+              <i class="fa-solid fa-circle-check me-1"></i> Confirm & Place Order
             </button>
           </form>
         </div>
@@ -969,6 +1057,83 @@
         </div>
       </div>
     </div>
+  <!-- =========================================================================
+       LIVE ORDERS DASHBOARD MODAL (Database View)
+       ========================================================================= -->
+  <div class="modal fade" id="liveOrdersModal" tabindex="-1" aria-labelledby="liveOrdersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+      <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);">
+        <div class="modal-header border-bottom border-secondary pb-3 px-4 pt-4">
+          <div>
+            <span class="badge-tag badge-gold mb-1 d-inline-block">
+              <i class="fa-solid fa-database me-1"></i> SQLite Database Persisted
+            </span>
+            <h4 class="modal-title font-serif fw-bold text-light mb-0" id="liveOrdersModalLabel">
+              Recent Cafe Orders &amp; Customer Records
+            </h4>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-warning" id="refreshOrdersBtn" title="Refresh from API">
+              <i class="fa-solid fa-rotate me-1"></i> Refresh
+            </button>
+            <button type="button" class="btn-close btn-close-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+
+        <div class="modal-body p-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <p class="text-secondary small mb-0">
+              Live orders stored in backend <code>CafeHaven.db</code>. Baristas can track order status, item lists, and customer profiles in real time.
+            </p>
+            <div class="small text-muted">
+              API Status: <span class="badge bg-success-subtle text-success border border-success" id="apiStatusBadge">Connected (ASP.NET Core 9)</span>
+            </div>
+          </div>
+
+          <div id="liveOrdersLoading" class="text-center py-5">
+            <div class="spinner-border text-warning" role="status">
+              <span class="visually-hidden">Loading orders...</span>
+            </div>
+            <p class="text-secondary small mt-2">Fetching orders from <code>/api/orders</code>...</p>
+          </div>
+
+          <div id="liveOrdersEmpty" class="text-center py-5 d-none">
+            <i class="fa-solid fa-mug-hot fs-1 text-muted mb-3 opacity-50"></i>
+            <h5 class="text-light">No orders placed yet</h5>
+            <p class="text-secondary small">Add drinks or pastries to your cart and checkout to create database records.</p>
+          </div>
+
+          <div class="table-responsive d-none" id="liveOrdersTableWrapper">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+              <thead>
+                <tr class="text-warning border-bottom border-secondary small text-uppercase" style="letter-spacing: 0.5px;">
+                  <th>Order Ref</th>
+                  <th>Customer</th>
+                  <th>Dining</th>
+                  <th>Items Ordered</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Placed At</th>
+                  <th class="text-end">Update Status</th>
+                </tr>
+              </thead>
+              <tbody id="liveOrdersTbody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top border-secondary px-4 py-3">
+          <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <span class="text-muted small">
+              <i class="fa-solid fa-server me-1"></i> Endpoints: <code>GET /api/orders</code> &bull; <code>PATCH /api/orders/{id}/status</code> &bull; <code>/swagger</code>
+            </span>
+            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- =========================================================================
@@ -988,6 +1153,23 @@
   <!-- =========================================================================
        FLOATING ACTION BUTTONS & TOAST CONTAINER
        ========================================================================= -->
+  <!-- Floating Sticky Cart Pill -->
+  <div class="floating-cart-pill" id="floatingCartPill" role="button" aria-label="Open Shopping Cart">
+    <div class="d-flex align-items-center gap-2">
+      <div class="floating-cart-icon-wrap">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span class="floating-cart-badge" id="floatingCartCount">0</span>
+      </div>
+      <div>
+        <div class="small fw-bold">Your Order</div>
+        <div class="floating-cart-subtotal" id="floatingCartTotal">$0.00</div>
+      </div>
+    </div>
+    <span class="floating-cart-cta-btn">
+      Checkout <i class="fa-solid fa-arrow-right ms-1"></i>
+    </span>
+  </div>
+
   <!-- WhatsApp Instant Chat Float -->
   <a href="https://wa.me/61123456789?text=Hello%20Brew%20Haven%20Cafe%2C%20I%20have%20a%20question..." target="_blank" class="whatsapp-float-btn" title="Chat on WhatsApp" aria-label="Chat on WhatsApp">
     <i class="fa-brands fa-whatsapp"></i>

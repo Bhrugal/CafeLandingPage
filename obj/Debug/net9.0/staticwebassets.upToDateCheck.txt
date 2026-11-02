@@ -1,0 +1,6 @@
+D:\Pol\CafeLandingPage\CafeLandingPage\wwwroot\index.html
+D:\Pol\CafeLandingPage\CafeLandingPage\wwwroot\css\style.css
+D:\Pol\CafeLandingPage\CafeLandingPage\wwwroot\js\main.js
+wwwroot\css\style.css
+wwwroot\index.html
+wwwroot\js\main.js

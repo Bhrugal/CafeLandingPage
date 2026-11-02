@@ -1,0 +1,1042 @@
+{
+  "Version": 1,
+  "Hash": "BHYiwjtwoktisd/6eAu01K6vJVdiRAuiIcOlIQTtvng=",
+  "Source": "CafeLandingPage",
+  "BasePath": "_content/CafeLandingPage",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "CafeLandingPage\\wwwroot",
+      "Source": "CafeLandingPage",
+      "ContentRoot": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\",
+      "BasePath": "_content/CafeLandingPage",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\c6hf7ijfo1-cfzpp35e89.gz",
+      "SourceId": "CafeLandingPage",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CafeLandingPage",
+      "RelativePath": "index#[.{fingerprint=cfzpp35e89}]?.html.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\index.html",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "ra6fl7smqn",
+      "Integrity": "o77kPaYcSKcC5qaIY0VYXhTD/xYeNuJGCIgQSWc2po0=",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\index.html"
+    },
+    {
+      "Identity": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\e1xqhmvujp-aarhbzqm2q.gz",
+      "SourceId": "CafeLandingPage",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CafeLandingPage",
+      "RelativePath": "css/style#[.{fingerprint=aarhbzqm2q}]?.css.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\css\\style.css",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "tuobt1o6gd",
+      "Integrity": "lTON6eXoO8BCzTZ7kGCnHUYgH9ziTUEJ6v4236qn7z8=",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\css\\style.css"
+    },
+    {
+      "Identity": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\qkmsgaf3co-gb7oc66h09.gz",
+      "SourceId": "CafeLandingPage",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CafeLandingPage",
+      "RelativePath": "js/main#[.{fingerprint=gb7oc66h09}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\js\\main.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "0y38yehvg7",
+      "Integrity": "CBCIGyXUfoz9xKWhLJYfeRmWLuZ6xdwkLRCUxZfT/KM=",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\js\\main.js"
+    },
+    {
+      "Identity": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\css\\style.css",
+      "SourceId": "CafeLandingPage",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\",
+      "BasePath": "_content/CafeLandingPage",
+      "RelativePath": "css/style#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "aarhbzqm2q",
+      "Integrity": "nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU=",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\style.css"
+    },
+    {
+      "Identity": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\index.html",
+      "SourceId": "CafeLandingPage",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\",
+      "BasePath": "_content/CafeLandingPage",
+      "RelativePath": "index#[.{fingerprint}]?.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "cfzpp35e89",
+      "Integrity": "aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28=",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    },
+    {
+      "Identity": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\js\\main.js",
+      "SourceId": "CafeLandingPage",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\",
+      "BasePath": "_content/CafeLandingPage",
+      "RelativePath": "js/main#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "gb7oc66h09",
+      "Integrity": "9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24=",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\main.js"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "css/style.aarhbzqm2q.css",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\e1xqhmvujp-aarhbzqm2q.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000121050720"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "8260"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"lTON6eXoO8BCzTZ7kGCnHUYgH9ziTUEJ6v4236qn7z8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:14:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "aarhbzqm2q"
+        },
+        {
+          "Name": "label",
+          "Value": "css/style.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU="
+        }
+      ]
+    },
+    {
+      "Route": "css/style.aarhbzqm2q.css",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\css\\style.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "48167"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:14:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "aarhbzqm2q"
+        },
+        {
+          "Name": "label",
+          "Value": "css/style.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU="
+        }
+      ]
+    },
+    {
+      "Route": "css/style.aarhbzqm2q.css.gz",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\e1xqhmvujp-aarhbzqm2q.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "8260"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"lTON6eXoO8BCzTZ7kGCnHUYgH9ziTUEJ6v4236qn7z8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:14:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "aarhbzqm2q"
+        },
+        {
+          "Name": "label",
+          "Value": "css/style.css.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-lTON6eXoO8BCzTZ7kGCnHUYgH9ziTUEJ6v4236qn7z8="
+        }
+      ]
+    },
+    {
+      "Route": "css/style.css",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\e1xqhmvujp-aarhbzqm2q.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000121050720"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "8260"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"lTON6eXoO8BCzTZ7kGCnHUYgH9ziTUEJ6v4236qn7z8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:14:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU="
+        }
+      ]
+    },
+    {
+      "Route": "css/style.css",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\css\\style.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "48167"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:14:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-nuRp+IJLLG3Wwg/1Z4PZYjXYTVGRPmm4FnXVD8fWUqU="
+        }
+      ]
+    },
+    {
+      "Route": "css/style.css.gz",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\e1xqhmvujp-aarhbzqm2q.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "8260"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"lTON6eXoO8BCzTZ7kGCnHUYgH9ziTUEJ6v4236qn7z8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:14:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-lTON6eXoO8BCzTZ7kGCnHUYgH9ziTUEJ6v4236qn7z8="
+        }
+      ]
+    },
+    {
+      "Route": "index.cfzpp35e89.html",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\c6hf7ijfo1-cfzpp35e89.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000080456996"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12428"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"o77kPaYcSKcC5qaIY0VYXhTD/xYeNuJGCIgQSWc2po0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:13:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "cfzpp35e89"
+        },
+        {
+          "Name": "label",
+          "Value": "index.html"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28="
+        }
+      ]
+    },
+    {
+      "Route": "index.cfzpp35e89.html",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\index.html",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "58280"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:13:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "cfzpp35e89"
+        },
+        {
+          "Name": "label",
+          "Value": "index.html"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28="
+        }
+      ]
+    },
+    {
+      "Route": "index.cfzpp35e89.html.gz",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\c6hf7ijfo1-cfzpp35e89.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12428"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"o77kPaYcSKcC5qaIY0VYXhTD/xYeNuJGCIgQSWc2po0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:13:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "cfzpp35e89"
+        },
+        {
+          "Name": "label",
+          "Value": "index.html.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-o77kPaYcSKcC5qaIY0VYXhTD/xYeNuJGCIgQSWc2po0="
+        }
+      ]
+    },
+    {
+      "Route": "index.html",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\c6hf7ijfo1-cfzpp35e89.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000080456996"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12428"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"o77kPaYcSKcC5qaIY0VYXhTD/xYeNuJGCIgQSWc2po0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:13:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28="
+        }
+      ]
+    },
+    {
+      "Route": "index.html",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\index.html",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "58280"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:13:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-aAuutdL+jxfdh+CiVBMRon2KQUeyudqbal86M1izT28="
+        }
+      ]
+    },
+    {
+      "Route": "index.html.gz",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\c6hf7ijfo1-cfzpp35e89.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12428"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"o77kPaYcSKcC5qaIY0VYXhTD/xYeNuJGCIgQSWc2po0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:13:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-o77kPaYcSKcC5qaIY0VYXhTD/xYeNuJGCIgQSWc2po0="
+        }
+      ]
+    },
+    {
+      "Route": "js/main.gb7oc66h09.js",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\qkmsgaf3co-gb7oc66h09.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000061154599"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "16351"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"CBCIGyXUfoz9xKWhLJYfeRmWLuZ6xdwkLRCUxZfT/KM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:17:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "gb7oc66h09"
+        },
+        {
+          "Name": "label",
+          "Value": "js/main.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24="
+        }
+      ]
+    },
+    {
+      "Route": "js/main.gb7oc66h09.js",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\js\\main.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "70901"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:17:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "gb7oc66h09"
+        },
+        {
+          "Name": "label",
+          "Value": "js/main.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24="
+        }
+      ]
+    },
+    {
+      "Route": "js/main.gb7oc66h09.js.gz",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\qkmsgaf3co-gb7oc66h09.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "16351"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"CBCIGyXUfoz9xKWhLJYfeRmWLuZ6xdwkLRCUxZfT/KM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:17:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "gb7oc66h09"
+        },
+        {
+          "Name": "label",
+          "Value": "js/main.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-CBCIGyXUfoz9xKWhLJYfeRmWLuZ6xdwkLRCUxZfT/KM="
+        }
+      ]
+    },
+    {
+      "Route": "js/main.js",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\qkmsgaf3co-gb7oc66h09.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000061154599"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "16351"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"CBCIGyXUfoz9xKWhLJYfeRmWLuZ6xdwkLRCUxZfT/KM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:17:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24="
+        }
+      ]
+    },
+    {
+      "Route": "js/main.js",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\wwwroot\\js\\main.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "70901"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:17:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-9MBqegsw0W3Y5eO+r0QP+aR+P2sXEClspGQO5Gr//24="
+        }
+      ]
+    },
+    {
+      "Route": "js/main.js.gz",
+      "AssetFile": "D:\\Pol\\CafeLandingPage\\CafeLandingPage\\obj\\Debug\\net9.0\\compressed\\qkmsgaf3co-gb7oc66h09.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "16351"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"CBCIGyXUfoz9xKWhLJYfeRmWLuZ6xdwkLRCUxZfT/KM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 27 Oct 2026 18:17:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-CBCIGyXUfoz9xKWhLJYfeRmWLuZ6xdwkLRCUxZfT/KM="
+        }
+      ]
+    }
+  ]
+}
