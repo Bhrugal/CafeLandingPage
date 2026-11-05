@@ -1,0 +1,19 @@
+
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# SQLite temporary files
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+# IDE files
+.idea/
