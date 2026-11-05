@@ -9,7 +9,6 @@ public class CreateOrderDto
     public string CustomerName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Contact phone is required.")]
-    [Phone(ErrorMessage = "Please provide a valid phone number.")]
     public string CustomerPhone { get; set; } = string.Empty;
 
     public string? CustomerEmail { get; set; }
@@ -22,13 +21,36 @@ public class CreateOrderDto
     public string? SpecialNotes { get; set; }
 
     [Required]
-    public string PaymentMethod { get; set; } = "Pay at Pickup Counter";
+    public string PaymentMethod { get; set; } = "Pay at Counter"; // "Pay at Counter", "Haven Wallet", "Credit Card"
 
     public string? PromoCode { get; set; }
+
+    // Stripe Payment Intent ID when processed via Stripe Gateway
+    public string? PaymentIntentId { get; set; }
+
+    // Card details when PaymentMethod is Credit Card
+    public CardPaymentDto? CardDetails { get; set; }
+
+    // Table Reservation linking (when user wants to book table together with food/drink)
+    public bool ReserveTable { get; set; } = false;
+    public int PartySize { get; set; } = 2;
+    public string? ReservationDate { get; set; }
+    public string? ReservationTime { get; set; }
+    public string? SeatingZone { get; set; } = "Indoor Lounge";
 
     [Required]
     [MinLength(1, ErrorMessage = "At least one item is required in the order.")]
     public List<CreateOrderItemDto> Items { get; set; } = new();
+}
+
+public class CardPaymentDto
+{
+    public string? PaymentIntentId { get; set; }
+    public string? CardNumber { get; set; }
+    public string? CardHolder { get; set; }
+    public string? ExpiryDate { get; set; }
+    public string? Cvc { get; set; }
+    public string? ZipCode { get; set; }
 }
 
 public class CreateOrderItemDto
@@ -59,6 +81,10 @@ public class OrderResponseDto
     public string PickupTimeOrTable { get; set; } = string.Empty;
     public string? SpecialNotes { get; set; }
     public string PaymentMethod { get; set; } = string.Empty;
+    public string PaymentStatus { get; set; } = string.Empty;
+    public string? TransactionId { get; set; }
+    public string? BookingCode { get; set; }
+    public int? ReservationId { get; set; }
     public decimal Subtotal { get; set; }
     public decimal Discount { get; set; }
     public decimal Tax { get; set; }

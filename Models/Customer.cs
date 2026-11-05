@@ -17,8 +17,11 @@ public class Customer
     [MaxLength(150)]
     public string? Email { get; set; }
 
+    public decimal WalletBalance { get; set; } = 25.00m; // Default starting balance / welcome credit
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public List<Order> Orders { get; set; } = new();
     public List<Reservation> Reservations { get; set; } = new();
+    public List<WalletTransaction> WalletTransactions { get; set; } = new();
 }

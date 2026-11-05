@@ -28,12 +28,15 @@ public class CreateReservationDto
     public string SeatingZone { get; set; } = "Indoor Lounge";
 
     public string? SpecialNotes { get; set; }
+
+    public string PaymentMethod { get; set; } = "Pay at Pickup Counter";
 }
 
 public class ReservationResponseDto
 {
     public int Id { get; set; }
     public string ReferenceCode { get; set; } = string.Empty;
+    public int? OrderId { get; set; }
     public string GuestName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
@@ -42,6 +45,9 @@ public class ReservationResponseDto
     public string ReservationTime { get; set; } = string.Empty;
     public string SeatingZone { get; set; } = string.Empty;
     public string? SpecialNotes { get; set; }
+    public string PaymentMethod { get; set; } = string.Empty;
+    public string PaymentStatus { get; set; } = string.Empty;
+    public decimal TotalAmount { get; set; }
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 }

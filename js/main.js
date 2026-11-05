@@ -1,3 +1,4 @@
+let lastDashboardTab = "orders";
 /**
  * ==========================================================================
  * BREW HAVEN CAFE - MAIN INTERACTIVE LOGIC
@@ -238,6 +239,7 @@ function initApp() {
   initLiveHours();
   initScrollNav();
   initDailySpecial();
+  initHavenWalletSystem();
   
   // Set default min date for reservation to today
   const resDateInput = document.getElementById('resDate');
@@ -1198,51 +1200,416 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
+/* ==========================================================================
+   CHECKOUT, BOOKING & 3-WAY PAYMENT GATEWAY SYSTEM
+   ========================================================================== */
+
+let selectedPaymentMethod = 'Pay at Counter';
+let isTableBookingSelected = false;
+let currentCustomerWallet = { balance: 25.00, phone: '', name: 'Valued Guest' };
+
+async function fetchCustomerWallet(phone) {
+  if (!phone || phone.trim().length < 6) return currentCustomerWallet;
+  try {
+    const res = await fetch(`/api/wallet/${encodeURIComponent(phone.trim())}`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.success && json.data) {
+        currentCustomerWallet.balance = parseFloat(json.data.walletBalance) || 0;
+        currentCustomerWallet.name = json.data.customerName || 'Valued Guest';
+        currentCustomerWallet.phone = phone.trim();
+
+        // Update UI badges
+        const balText = `$${currentCustomerWallet.balance.toFixed(2)}`;
+        const checkoutBal = document.getElementById('checkoutWalletBalText');
+        if (checkoutBal) checkoutBal.textContent = balText;
+
+        const panelBal = document.getElementById('panelWalletBalDisplay');
+        if (panelBal) panelBal.textContent = balText;
+
+        const navPill = document.getElementById('navWalletPill');
+        if (navPill) navPill.textContent = balText;
+
+        // Check if balance meets current cart total
+        checkWalletSufficiency();
+      }
+    }
+  } catch (err) {
+    console.warn('Could not fetch wallet:', err);
+  }
+  return currentCustomerWallet;
+}
+
+function checkWalletSufficiency() {
+  const totalEl = document.getElementById('checkoutOrderTotal');
+  const total = totalEl ? (parseFloat(totalEl.textContent.replace('$', '')) || 0) : 0;
+  const warningEl = document.getElementById('walletInsufficientWarning');
+  const submitBtn = document.getElementById('submitOrderBtn');
+
+  if (selectedPaymentMethod === 'Haven Wallet') {
+    if (currentCustomerWallet.balance < total) {
+      if (warningEl) {
+        warningEl.classList.remove('d-none');
+        warningEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> Balance: <strong>$${currentCustomerWallet.balance.toFixed(2)}</strong> is less than <strong>$${total.toFixed(2)}</strong>. Please top up below:`;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-wallet me-1"></i> Top-Up Needed to Pay ($${total.toFixed(2)})`;
+      }
+    } else {
+      if (warningEl) warningEl.classList.add('d-none');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i> Confirm & Pay with Wallet ($${total.toFixed(2)})`;
+      }
+    }
+  }
+}
+
 function initCheckoutForm() {
   const form = document.getElementById('checkoutForm');
   if (!form) return;
 
+  const phoneInput = document.getElementById('orderCustPhone');
+  const nameInput = document.getElementById('orderCustName');
+
+  // Pre-fill today for booking date
+  const bookingDateInput = document.getElementById('bookingDate');
+  if (bookingDateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    bookingDateInput.min = today;
+    bookingDateInput.value = today;
+  }
+
+  // 1. DINING / TABLE RESERVATION TOGGLES
+  const pillTakeaway = document.getElementById('pillTakeaway');
+  const pillDineIn = document.getElementById('pillDineIn');
+  const takeawaySlotWrapper = document.getElementById('takeawaySlotWrapper');
+  const dineInFieldsWrapper = document.getElementById('dineInFieldsWrapper');
+  const checkoutDiningBadge = document.getElementById('checkoutDiningBadge');
+
+  if (pillTakeaway && pillDineIn) {
+    pillTakeaway.addEventListener('click', () => {
+      isTableBookingSelected = false;
+      currentDiningType = 'takeaway';
+      pillTakeaway.classList.add('active');
+      pillDineIn.classList.remove('active');
+      if (takeawaySlotWrapper) takeawaySlotWrapper.classList.remove('d-none');
+      if (dineInFieldsWrapper) dineInFieldsWrapper.classList.add('d-none');
+      if (checkoutDiningBadge) {
+        checkoutDiningBadge.textContent = 'Takeaway';
+        checkoutDiningBadge.className = 'badge-tag badge-gold';
+      }
+    });
+
+    pillDineIn.addEventListener('click', () => {
+      isTableBookingSelected = true;
+      currentDiningType = 'dinein';
+      pillDineIn.classList.add('active');
+      pillTakeaway.classList.remove('active');
+      if (takeawaySlotWrapper) takeawaySlotWrapper.classList.add('d-none');
+      if (dineInFieldsWrapper) dineInFieldsWrapper.classList.remove('d-none');
+      if (checkoutDiningBadge) {
+        checkoutDiningBadge.textContent = 'Reserved Table (Dine-In)';
+        checkoutDiningBadge.className = 'badge-tag badge-outline';
+      }
+    });
+  }
+
+  // 2. PAYMENT METHOD SELECTION
+  const cardCounter = document.getElementById('methodCounterCard');
+  const cardWallet = document.getElementById('methodWalletCard');
+  const cardCard = document.getElementById('methodCardCard');
+  const walletPanel = document.getElementById('walletDetailsPanel');
+  const cardGatewayPanel = document.getElementById('cardGatewayPanel');
+  const noteEl = document.getElementById('checkoutPaymentNote');
+
+  function updatePaymentMethod(method) {
+    selectedPaymentMethod = method;
+
+    [cardCounter, cardWallet, cardCard].forEach(c => {
+      if (c) c.classList.remove('active');
+    });
+
+    const totalEl = document.getElementById('checkoutOrderTotal');
+    const total = totalEl ? totalEl.textContent : '$0.00';
+    const submitBtn = document.getElementById('submitOrderBtn');
+
+    if (method === 'Pay at Counter') {
+      if (cardCounter) cardCounter.classList.add('active');
+      if (walletPanel) walletPanel.classList.add('d-none');
+      if (cardGatewayPanel) cardGatewayPanel.classList.add('d-none');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i> Confirm & Place Order (At Counter)`;
+      }
+      if (noteEl) {
+        noteEl.innerHTML = `<i class="fa-solid fa-info-circle me-1"></i> Option 1: Pay at Counter. Order is <strong>Pending</strong>; staff confirms when served.`;
+      }
+    } else if (method === 'Haven Wallet') {
+      if (cardWallet) cardWallet.classList.add('active');
+      if (walletPanel) walletPanel.classList.remove('d-none');
+      if (cardGatewayPanel) cardGatewayPanel.classList.add('d-none');
+      if (noteEl) {
+        noteEl.innerHTML = `<i class="fa-solid fa-wallet me-1"></i> Option 2: Haven Wallet. 1-click booking deducted from your digital balance.`;
+      }
+      // Load customer balance for current phone
+      if (phoneInput && phoneInput.value.trim()) {
+        fetchCustomerWallet(phoneInput.value.trim());
+      }
+      checkWalletSufficiency();
+    } else if (method === 'Credit Card') {
+      if (cardCard) cardCard.classList.add('active');
+      if (walletPanel) walletPanel.classList.add('d-none');
+      if (cardGatewayPanel) cardGatewayPanel.classList.remove('d-none');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-lock me-1"></i> Authorize & Pay (${total}) via Gateway`;
+      }
+      if (noteEl) {
+        noteEl.innerHTML = `<i class="fa-solid fa-shield-halved me-1"></i> Option 3: Card Gateway. 256-bit encrypted card checkout & instant confirmation.`;
+      }
+    }
+  }
+
+  if (cardCounter) cardCounter.addEventListener('click', () => updatePaymentMethod('Pay at Counter'));
+  if (cardWallet) cardWallet.addEventListener('click', () => updatePaymentMethod('Haven Wallet'));
+  if (cardCard) cardCard.addEventListener('click', () => updatePaymentMethod('Credit Card'));
+
+  // 3. AUTO-LOAD WALLET ON PHONE INPUT
+  let phoneDebounce = null;
+  if (phoneInput) {
+    phoneInput.addEventListener('input', () => {
+      clearTimeout(phoneDebounce);
+      phoneDebounce = setTimeout(() => {
+        if (phoneInput.value.trim().length >= 6) {
+          fetchCustomerWallet(phoneInput.value.trim());
+        }
+      }, 500);
+    });
+  }
+
+  // 4. QUICK TOP-UP BUTTONS INSIDE CHECKOUT
+  const topupPills = document.querySelectorAll('.btn-topup-pill');
+  topupPills.forEach(pill => {
+    pill.addEventListener('click', async () => {
+      const amount = parseFloat(pill.dataset.amount) || 10;
+      const phone = phoneInput ? phoneInput.value.trim() : '+61 400 123 456';
+      const name = nameInput ? nameInput.value.trim() : 'Valued Guest';
+
+      const spinner = document.getElementById('topupSpinner');
+      if (spinner) spinner.classList.remove('d-none');
+
+      try {
+        const res = await fetch('/api/wallet/topup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phone || '+61 400 123 456', customerName: name, amount: amount })
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.data) {
+            currentCustomerWallet.balance = json.data.walletBalance;
+            const balStr = `$${currentCustomerWallet.balance.toFixed(2)}`;
+            const checkoutBal = document.getElementById('checkoutWalletBalText');
+            if (checkoutBal) checkoutBal.textContent = balStr;
+            const panelBal = document.getElementById('panelWalletBalDisplay');
+            if (panelBal) panelBal.textContent = balStr;
+            const navPill = document.getElementById('navWalletPill');
+            if (navPill) navPill.textContent = balStr;
+
+            showToast(`Added $${amount.toFixed(2)} to your Haven Wallet! New Balance: ${balStr}`, 'success');
+            checkWalletSufficiency();
+          }
+        }
+      } catch (err) {
+        showToast('Top-up connection error', 'error');
+      } finally {
+        if (spinner) spinner.classList.add('d-none');
+      }
+    });
+  });
+
+  const refreshWalletBtn = document.getElementById('refreshWalletBtn');
+  if (refreshWalletBtn) {
+    refreshWalletBtn.addEventListener('click', () => {
+      const phone = phoneInput ? phoneInput.value.trim() : '+61 400 123 456';
+      fetchCustomerWallet(phone);
+      showToast('Wallet refreshed', 'info');
+    });
+  }
+
+  // 5. CARD GATEWAY INTERACTION & AUTO-FILL
+  const fillDemoCardBtn = document.getElementById('fillDemoCardBtn');
+  const cardNumInput = document.getElementById('cardNumInput');
+  const cardHolderInput = document.getElementById('cardHolderInput');
+  const cardExpiryInput = document.getElementById('cardExpiryInput');
+  const cardCvcInput = document.getElementById('cardCvcInput');
+  const cardZipInput = document.getElementById('cardZipInput');
+
+  const cardNumPreview = document.getElementById('cardNumPreview');
+  const cardHolderPreview = document.getElementById('cardHolderPreview');
+  const cardExpiryPreview = document.getElementById('cardExpiryPreview');
+  const cardBrandLogo = document.getElementById('cardBrandLogo');
+
+  if (fillDemoCardBtn) {
+    fillDemoCardBtn.addEventListener('click', () => {
+      if (cardNumInput) cardNumInput.value = '4242 4242 4242 4242';
+      if (cardHolderInput) cardHolderInput.value = (nameInput && nameInput.value.trim()) ? nameInput.value.trim().toUpperCase() : 'ELENA ROSTOVA';
+      if (cardExpiryInput) cardExpiryInput.value = '12/28';
+      if (cardCvcInput) cardCvcInput.value = '123';
+      if (cardZipInput) cardZipInput.value = '3000';
+
+      if (cardNumPreview) cardNumPreview.textContent = '4242 •••• •••• 4242';
+      if (cardHolderPreview) cardHolderPreview.textContent = (nameInput && nameInput.value.trim()) ? nameInput.value.trim().toUpperCase() : 'ELENA ROSTOVA';
+      if (cardExpiryPreview) cardExpiryPreview.textContent = '12/28';
+      if (cardBrandLogo) cardBrandLogo.innerHTML = '<i class="fa-brands fa-cc-visa text-warning"></i>';
+
+      showToast('Demo test card details filled!', 'info');
+    });
+  }
+
+  if (cardNumInput) {
+    cardNumInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+      let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+      e.target.value = formatted;
+
+      if (cardNumPreview) {
+        if (val.length >= 4) {
+          cardNumPreview.textContent = formatted;
+        } else {
+          cardNumPreview.textContent = '•••• •••• •••• 4242';
+        }
+      }
+
+      if (cardBrandLogo) {
+        if (val.startsWith('4')) {
+          cardBrandLogo.innerHTML = '<i class="fa-brands fa-cc-visa text-warning"></i>';
+        } else if (val.startsWith('5')) {
+          cardBrandLogo.innerHTML = '<i class="fa-brands fa-cc-mastercard text-danger"></i>';
+        } else if (val.startsWith('3')) {
+          cardBrandLogo.innerHTML = '<i class="fa-brands fa-cc-amex text-info"></i>';
+        } else {
+          cardBrandLogo.innerHTML = '<i class="fa-solid fa-credit-card"></i>';
+        }
+      }
+    });
+  }
+
+  if (cardHolderInput) {
+    cardHolderInput.addEventListener('input', (e) => {
+      if (cardHolderPreview) {
+        cardHolderPreview.textContent = e.target.value.trim().toUpperCase() || 'VALUED GUEST';
+      }
+    });
+  }
+
+  if (cardExpiryInput) {
+    cardExpiryInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+      if (val.length >= 3) {
+        e.target.value = `${val.substring(0, 2)}/${val.substring(2)}`;
+      } else {
+        e.target.value = val;
+      }
+      if (cardExpiryPreview) cardExpiryPreview.textContent = e.target.value || '12/28';
+    });
+  }
+
+  // 6. FORM SUBMIT HANDLER
   form.addEventListener('submit', async (e) => {
+    lastDashboardTab = 'bookings';
     e.preventDefault();
+
+    if (cart.length === 0) {
+      showToast('Your cart is empty. Please add items to order.', 'error');
+      return;
+    }
 
     const submitBtn = document.getElementById('submitOrderBtn');
     const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving to Database...';
-    }
 
-    const name = document.getElementById('orderCustName').value.trim();
-    const phone = document.getElementById('orderCustPhone').value.trim();
+    const name = nameInput ? nameInput.value.trim() : 'Guest';
+    const phone = phoneInput ? phoneInput.value.trim() : '+61 400 123 456';
     const emailInput = document.getElementById('orderCustEmail');
     const email = (emailInput && emailInput.value.trim()) ? emailInput.value.trim() : null;
     const notesInput = document.getElementById('orderNotesInput');
     const notes = notesInput ? notesInput.value.trim() : '';
 
-    let locationDetail = '';
-    if (currentDiningType === 'dinein') {
-      const tableInput = document.getElementById('orderTableNumber');
-      locationDetail = (tableInput && tableInput.value.trim()) ? tableInput.value.trim() : 'Lounge Bar';
-    } else {
-      const pickupSelect = document.getElementById('orderPickupTime');
-      locationDetail = pickupSelect ? pickupSelect.value : 'ASAP';
+    // Calculate totals
+    const totalEl = document.getElementById('checkoutOrderTotal');
+    const totalAmount = totalEl ? (parseFloat(totalEl.textContent.replace('$', '')) || 0) : 0;
+    const itemsCount = cart.reduce((sum, i) => sum + i.qty, 0);
+
+    // Validate Payment Specific Requirements
+    if (selectedPaymentMethod === 'Haven Wallet') {
+      if (currentCustomerWallet.balance < totalAmount) {
+        showToast(`Insufficient balance ($${currentCustomerWallet.balance.toFixed(2)} available). Please top up first.`, 'error');
+        return;
+      }
+    } else if (selectedPaymentMethod === 'Credit Card') {
+      const cardNum = cardNumInput ? cardNumInput.value.replace(/\s+/g, '') : '';
+      if (!cardNum || cardNum.length < 12) {
+        showToast('Please enter a valid card number or click "Auto-Fill Test Card".', 'error');
+        return;
+      }
     }
 
-    const payRadio = document.querySelector('input[name="payOption"]:checked');
-    const pay = payRadio ? payRadio.value : 'Pay at Counter';
-    const totalEl = document.getElementById('checkoutOrderTotal');
-    const totalText = totalEl ? totalEl.textContent : '$0.00';
-    const itemsCount = cart.reduce((sum, i) => sum + i.qty, 0);
+    // Determine Dining & Booking details
+    let locationDetail = '';
+    let tableBookingData = {
+      reserveTable: isTableBookingSelected,
+      partySize: 2,
+      reservationDate: null,
+      reservationTime: null,
+      seatingZone: 'Indoor Lounge'
+    };
+
+    if (isTableBookingSelected) {
+      const guestsSel = document.getElementById('bookingGuests');
+      const dateInp = document.getElementById('bookingDate');
+      const timeSel = document.getElementById('bookingTime');
+      const zoneSel = document.getElementById('bookingZone');
+
+      tableBookingData.partySize = guestsSel ? parseInt(guestsSel.value, 10) : 2;
+      tableBookingData.reservationDate = dateInp ? dateInp.value : new Date().toISOString().split('T')[0];
+      tableBookingData.reservationTime = timeSel ? timeSel.value : '10:00 AM';
+      tableBookingData.seatingZone = zoneSel ? zoneSel.value : 'Indoor Lounge';
+      locationDetail = `Reserved Table (${tableBookingData.partySize} guests • ${tableBookingData.seatingZone} • ${tableBookingData.reservationTime})`;
+    } else {
+      const pickupSelect = document.getElementById('orderPickupTime');
+      locationDetail = pickupSelect ? pickupSelect.value : 'ASAP (15-20 mins)';
+    }
+
+    // Card Details payload if Card option
+    let cardPayload = null;
+    if (selectedPaymentMethod === 'Credit Card') {
+      cardPayload = {
+        cardNumber: cardNumInput ? cardNumInput.value.trim() : '4242 4242 4242 4242',
+        cardHolder: cardHolderInput ? cardHolderInput.value.trim() : name,
+        expiryDate: cardExpiryInput ? cardExpiryInput.value.trim() : '12/28',
+        cvc: cardCvcInput ? cardCvcInput.value.trim() : '123',
+        zipCode: cardZipInput ? cardZipInput.value.trim() : '3000'
+      };
+    }
 
     const payload = {
       customerName: name,
       customerPhone: phone,
       customerEmail: email,
-      diningOption: currentDiningType,
+      diningOption: isTableBookingSelected ? 'dinein' : 'takeaway',
       pickupTimeOrTable: locationDetail,
       specialNotes: notes,
-      paymentMethod: pay,
+      paymentMethod: selectedPaymentMethod,
       promoCode: activeCoupon || null,
+      cardDetails: cardPayload,
+      reserveTable: isTableBookingSelected,
+      partySize: tableBookingData.partySize,
+      reservationDate: tableBookingData.reservationDate,
+      reservationTime: tableBookingData.reservationTime,
+      seatingZone: tableBookingData.seatingZone,
       items: cart.map(item => ({
         menuItemId: item.id || 0,
         itemName: item.name,
@@ -1253,15 +1620,57 @@ function initCheckoutForm() {
       }))
     };
 
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      if (selectedPaymentMethod === 'Credit Card') {
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authorizing Payment Gateway (256-bit SSL)...';
+      } else {
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing Booking...';
+      }
+    }
+
+    let stripePaymentIntentId = null;
+    if (selectedPaymentMethod === 'Credit Card') {
+      if (submitBtn) {
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting to Stripe Gateway (256-bit SSL)...';
+      }
+      try {
+        const intentRes = await fetch('/api/payments/create-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: totalAmount,
+            currency: 'usd',
+            customerName: name,
+            customerEmail: email || 'guest@brewhaven.cafe',
+            orderReference: `BH-${Math.floor(100000 + Math.random() * 900000)}`
+          })
+        });
+        if (intentRes.ok) {
+          const intentData = await intentRes.json();
+          if (intentData && intentData.success && intentData.data) {
+            stripePaymentIntentId = intentData.data.paymentIntentId;
+          }
+        }
+      } catch (intentErr) {
+        console.warn('Stripe gateway API error, using simulation fallback:', intentErr);
+        stripePaymentIntentId = `pi_test_${Math.floor(100000 + Math.random() * 900000)}`;
+      }
+      payload.paymentIntentId = stripePaymentIntentId;
+      if (payload.cardDetails) payload.cardDetails.paymentIntentId = stripePaymentIntentId;
+    }
+    lastDashboardTab = 'orders';
+
     let orderReference = `BH-${Math.floor(100000 + Math.random() * 900000)}`;
+    let bookingCode = null;
+    let paymentStatus = selectedPaymentMethod === 'Pay at Counter' ? 'Unpaid (At Counter)' : 'Paid';
+    let transactionId = null;
     let isPersistedToDb = false;
 
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
@@ -1269,17 +1678,31 @@ function initCheckoutForm() {
         const result = await response.json();
         if (result && result.success && result.data) {
           orderReference = result.data.orderReference;
+          bookingCode = result.data.bookingCode;
+          paymentStatus = result.data.paymentStatus;
+          transactionId = result.data.transactionId;
           isPersistedToDb = true;
-          showToast(`Order ${orderReference} stored in SQLite database!`, 'success');
+
+          showToast(`Order ${orderReference} confirmed in SQLite database!`, 'success');
+
+          // Refresh wallet balance after debit
+          if (selectedPaymentMethod === 'Haven Wallet') {
+            fetchCustomerWallet(phone);
+          }
         }
       } else {
         const errResult = await response.json().catch(() => null);
-        console.warn('Backend returned non-200 status', response.status, errResult);
-        showToast('Processed with local safety fallback', 'info');
+        const errMsg = errResult?.message || 'Server error occurred during checkout.';
+        showToast(errMsg, 'error');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHtml;
+        }
+        return;
       }
     } catch (networkErr) {
       console.warn('Could not connect to /api/orders, running in offline fallback:', networkErr);
-      showToast('Offline Mode: Order saved locally', 'info');
+      showToast('Offline Mode: Order recorded locally', 'info');
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -1299,20 +1722,38 @@ function initCheckoutForm() {
     const confirmMessage = document.getElementById('confirmMessage');
     const confirmDetails = document.getElementById('confirmDetails');
 
-    if (confirmTitle) confirmTitle.textContent = "Order Placed Successfully!";
-    if (confirmMessage) confirmMessage.textContent = `Thank you, ${name}! Your specialty coffee order has been queued at Brew Haven.`;
+    let statusBadgeHtml = '';
+    if (selectedPaymentMethod === 'Pay at Counter') {
+      statusBadgeHtml = `<span class="badge bg-warning-subtle text-warning border border-warning"><i class="fa-solid fa-clock me-1"></i>Pending • Pay at Counter</span>`;
+    } else if (selectedPaymentMethod === 'Haven Wallet') {
+      statusBadgeHtml = `<span class="badge bg-success-subtle text-success border border-success"><i class="fa-solid fa-check-circle me-1"></i>Paid via Haven Wallet</span>`;
+    } else {
+      statusBadgeHtml = `<span class="badge bg-info-subtle text-info border border-info"><i class="fa-solid fa-credit-card me-1"></i>Paid via Card Gateway</span>`;
+    }
+
+    if (confirmTitle) confirmTitle.textContent = isTableBookingSelected ? "Table & Order Confirmed!" : "Order Placed Successfully!";
+    if (confirmMessage) {
+      if (selectedPaymentMethod === 'Pay at Counter') {
+        confirmMessage.textContent = `Thank you, ${name}! Your order has been placed as Pending. Please pay at the counter when our barista serves your order.`;
+      } else {
+        confirmMessage.textContent = `Thank you, ${name}! Your payment has been authorized and your cafe booking is confirmed.`;
+      }
+    }
+
     if (confirmDetails) {
       confirmDetails.innerHTML = `
-        <div class="mb-2"><strong>Order Reference:</strong> <span class="text-warning fw-bold">${orderReference}</span> ${isPersistedToDb ? '<span class="badge bg-success-subtle text-success ms-1"><i class="fa-solid fa-check-circle me-1"></i>Saved to SQLite</span>' : ''}</div>
-        <div class="mb-1"><strong>Dining Preference:</strong> <span class="badge-tag badge-gold">${currentDiningType.toUpperCase()}</span></div>
-        <div class="mb-1"><strong>${currentDiningType === 'dinein' ? 'Table / Area:' : 'Ready Time:'}</strong> ${escapeHtml(locationDetail)}</div>
+        <div class="mb-2"><strong>Order Reference:</strong> <span class="text-warning fw-bold">${orderReference}</span> ${isPersistedToDb ? '<span class="badge bg-success-subtle text-success ms-1"><i class="fa-solid fa-database me-1"></i>SQLite Stored</span>' : ''}</div>
+        ${bookingCode ? `<div class="mb-2"><strong>Table Reservation Code:</strong> <span class="text-info fw-bold">${bookingCode}</span> <span class="badge bg-info-subtle text-info ms-1"><i class="fa-solid fa-chair me-1"></i>Table Reserved</span></div>` : ''}
+        <div class="mb-1"><strong>Dining Preference:</strong> <span class="badge-tag badge-gold">${(isTableBookingSelected ? 'Dine-In Table' : 'Takeaway').toUpperCase()}</span></div>
+        <div class="mb-1"><strong>Details:</strong> ${escapeHtml(locationDetail)}</div>
         <div class="mb-1"><strong>Items Ordered:</strong> ${itemsCount} items</div>
         ${notes ? `<div class="mb-1"><strong>Barista Notes:</strong> "${escapeHtml(notes)}"</div>` : ''}
         <div class="mb-1"><strong>Contact Phone:</strong> ${escapeHtml(phone)}</div>
-        ${email ? `<div class="mb-1"><strong>Receipt Email:</strong> ${escapeHtml(email)}</div>` : ''}
-        <div class="mb-1"><strong>Payment:</strong> ${escapeHtml(pay)}</div>
+        <div class="mb-1"><strong>Payment Method:</strong> ${escapeHtml(selectedPaymentMethod)}</div>
+        <div class="mb-1"><strong>Payment Status:</strong> ${statusBadgeHtml}</div>
+        ${transactionId ? `<div class="mb-1 text-muted small"><strong>Transaction ID:</strong> <code>${transactionId}</code></div>` : ''}
         <div class="mt-2 pt-2 border-top border-secondary d-flex justify-content-between align-items-center">
-          <strong>Total Payable:</strong> <span class="text-warning fw-bold fs-5">${totalText}</span>
+          <strong>Total Amount:</strong> <span class="text-warning fw-bold fs-5">$${totalAmount.toFixed(2)}</span>
         </div>
       `;
     }
@@ -1327,6 +1768,9 @@ function initCheckoutForm() {
       const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
       confirmModal.show();
     }
+
+    // Reload live orders if modal is active
+    loadLiveOrders();
   });
 }
 
@@ -1515,6 +1959,9 @@ function initLiveOrdersModal() {
   const openBtn = document.getElementById('openOrdersBtn');
   const refreshBtn = document.getElementById('refreshOrdersBtn');
   const modalEl = document.getElementById('liveOrdersModal');
+  const viewInDashboardBtn = document.getElementById('viewInDashboardBtn');
+  const tabOrdersBtn = document.getElementById('tabOrdersBtn');
+  const tabBookingsBtn = document.getElementById('tabBookingsBtn');
 
   if (openBtn && modalEl && typeof bootstrap !== 'undefined') {
     openBtn.addEventListener('click', () => {
@@ -1522,6 +1969,34 @@ function initLiveOrdersModal() {
       modal.show();
       loadLiveOrders();
     });
+  }
+
+  if (viewInDashboardBtn && modalEl && typeof bootstrap !== 'undefined') {
+    viewInDashboardBtn.addEventListener('click', () => {
+      const confirmModalEl = document.getElementById('confirmationModal');
+      if (confirmModalEl && typeof bootstrap !== 'undefined') {
+        const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+        if (confirmModal) confirmModal.hide();
+      }
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+
+      if (lastDashboardTab === 'bookings' && tabBookingsBtn && typeof bootstrap !== 'undefined') {
+        const tab = bootstrap.Tab.getOrCreateInstance(tabBookingsBtn);
+        tab.show();
+      } else if (tabOrdersBtn && typeof bootstrap !== 'undefined') {
+        const tab = bootstrap.Tab.getOrCreateInstance(tabOrdersBtn);
+        tab.show();
+      }
+      loadLiveOrders();
+    });
+  }
+
+  if (tabOrdersBtn) {
+    tabOrdersBtn.addEventListener('click', () => { lastDashboardTab = 'orders'; });
+  }
+  if (tabBookingsBtn) {
+    tabBookingsBtn.addEventListener('click', () => { lastDashboardTab = 'bookings'; });
   }
 
   if (refreshBtn) {
@@ -1573,6 +2048,34 @@ async function loadLiveOrders() {
 
       const placedDate = order.createdAt ? new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }) : 'Recently';
 
+      // Determine Payment Badge & Label
+      const payMethodLower = (order.paymentMethod || '').toLowerCase();
+      const payStatusLower = (order.paymentStatus || '').toLowerCase();
+      let paymentBadgeHtml = '';
+
+      if (payMethodLower.includes('wallet') || payStatusLower.includes('wallet')) {
+        paymentBadgeHtml = `
+          <span class="badge-tag badge-pay-wallet"><i class="fa-solid fa-wallet me-1"></i>Wallet</span>
+          <div class="text-secondary small mt-1" style="font-size: 0.7rem;">Paid &bull; <code>${escapeHtml(order.transactionId || 'WAL-PAY')}</code></div>
+        `;
+      } else if (payMethodLower.includes('card') || payStatusLower.includes('card')) {
+        paymentBadgeHtml = `
+          <span class="badge-tag badge-pay-card"><i class="fa-solid fa-credit-card me-1"></i>Card Gateway</span>
+          <div class="text-secondary small mt-1" style="font-size: 0.7rem;">Paid &bull; <code>${escapeHtml(order.transactionId ? order.transactionId.substring(0, 16) + '...' : 'APPROVED')}</code></div>
+        `;
+      } else {
+        const isCounterPaid = payStatusLower.includes('paid');
+        paymentBadgeHtml = `
+          <span class="badge-tag badge-pay-counter"><i class="fa-solid fa-shop me-1"></i>At Counter</span>
+          <div class="small mt-1 ${isCounterPaid ? 'text-success fw-bold' : 'text-warning'} style="font-size: 0.7rem;">
+            ${isCounterPaid ? '<i class="fa-solid fa-check me-1"></i>Paid at Counter' : '<i class="fa-solid fa-clock me-1"></i>Unpaid (Counter)'}
+          </div>
+        `;
+      }
+
+      // Check if At-Counter order needs Barista serving action
+      const needsCounterConfirmation = (payMethodLower.includes('counter') || payStatusLower.includes('unpaid')) && !payStatusLower.includes('paid') && statusLower !== 'completed';
+
       return `
         <tr>
           <td>
@@ -1584,6 +2087,7 @@ async function loadLiveOrders() {
           </td>
           <td>
             <span class="badge-tag badge-outline text-uppercase" style="font-size: 0.72rem;">${escapeHtml(order.diningOption || 'takeaway')}</span>
+            ${order.bookingCode ? `<span class="badge bg-warning-subtle text-warning fw-bold ms-1" style="font-size: 0.7rem;" title="Table Reserved"><i class="fa-solid fa-chair me-1"></i>${escapeHtml(order.bookingCode)}</span>` : ''}
             <div class="text-secondary small mt-1">${escapeHtml(order.pickupTimeOrTable || '')}</div>
           </td>
           <td>
@@ -1592,7 +2096,10 @@ async function loadLiveOrders() {
             </div>
           </td>
           <td>
-            <span class="text-warning fw-bold font-serif">$${(order.totalAmount || 0).toFixed(2)}</span>
+            <span class="text-warning fw-bold font-serif fs-6">$${(order.totalAmount || 0).toFixed(2)}</span>
+          </td>
+          <td>
+            ${paymentBadgeHtml}
           </td>
           <td>
             <span class="badge-order-status ${statusBadgeClass}">
@@ -1603,17 +2110,24 @@ async function loadLiveOrders() {
             ${placedDate}
           </td>
           <td class="text-end">
-            <div class="dropdown d-inline-block">
-              <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-1 px-2 text-gold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.78rem;">
-                Status
-              </button>
-              <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
-                <li><button class="dropdown-item small" type="button" onclick="updateOrderStatus(${order.id}, 'Pending')"><i class="fa-solid fa-clock text-warning me-2"></i>Pending</button></li>
-                <li><button class="dropdown-item small" type="button" onclick="updateOrderStatus(${order.id}, 'Brewing')"><i class="fa-solid fa-mug-hot text-info me-2"></i>Brewing</button></li>
-                <li><button class="dropdown-item small" type="button" onclick="updateOrderStatus(${order.id}, 'Completed')"><i class="fa-solid fa-circle-check text-success me-2"></i>Completed</button></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><button class="dropdown-item small text-danger" type="button" onclick="updateOrderStatus(${order.id}, 'Cancelled')"><i class="fa-solid fa-ban me-2"></i>Cancelled</button></li>
-              </ul>
+            <div class="d-flex align-items-center justify-content-end gap-1">
+              ${needsCounterConfirmation ? `
+                <button class="btn-serve-counter" onclick="confirmCounterOrder(${order.id})" title="Serve Order & Confirm Counter Payment">
+                  <i class="fa-solid fa-check me-1"></i>Serve &amp; Confirm
+                </button>
+              ` : ''}
+              <div class="dropdown d-inline-block">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-1 px-2 text-gold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.78rem;">
+                  Status
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
+                  <li><button class="dropdown-item small" type="button" onclick="updateOrderStatus(${order.id}, 'Pending')"><i class="fa-solid fa-clock text-warning me-2"></i>Pending</button></li>
+                  <li><button class="dropdown-item small" type="button" onclick="updateOrderStatus(${order.id}, 'Brewing')"><i class="fa-solid fa-mug-hot text-info me-2"></i>Brewing</button></li>
+                  <li><button class="dropdown-item small" type="button" onclick="updateOrderStatus(${order.id}, 'Completed')"><i class="fa-solid fa-circle-check text-success me-2"></i>Completed</button></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><button class="dropdown-item small text-danger" type="button" onclick="updateOrderStatus(${order.id}, 'Cancelled')"><i class="fa-solid fa-ban me-2"></i>Cancelled</button></li>
+                </ul>
+              </div>
             </div>
           </td>
         </tr>
@@ -1629,6 +2143,23 @@ async function loadLiveOrders() {
     if (emptyP) emptyP.textContent = 'Could not connect to /api/orders. Ensure the ASP.NET Core server is running.';
   }
 }
+
+window.confirmCounterOrder = async function(orderId) {
+  try {
+    const res = await fetch(`/api/orders/${orderId}/confirm-counter`, {
+      method: 'PATCH'
+    });
+
+    if (res.ok) {
+      showToast('Order served & confirmed as Paid at Counter!', 'success');
+      loadLiveOrders();
+    } else {
+      showToast('Failed to confirm counter order', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while confirming order', 'error');
+  }
+};
 
 window.updateOrderStatus = async function(orderId, newStatus) {
   try {
@@ -1648,6 +2179,134 @@ window.updateOrderStatus = async function(orderId, newStatus) {
     showToast('Network error while updating status', 'error');
   }
 };
+
+/* ==========================================================================
+   HAVEN DIGITAL WALLET SYSTEM & MODAL
+   ========================================================================== */
+
+function initHavenWalletSystem() {
+  const openWalletBtn = document.getElementById('openWalletBtn');
+  const walletModalEl = document.getElementById('walletModal');
+  const phoneLookupInput = document.getElementById('walletPhoneLookup');
+  const btnCheckWallet = document.getElementById('btnCheckWallet');
+  const btnExecuteModalTopup = document.getElementById('btnExecuteModalTopup');
+  const topupAmtBtns = document.querySelectorAll('.btn-modal-topup');
+  let selectedModalTopupAmt = 50;
+
+  if (openWalletBtn && walletModalEl && typeof bootstrap !== 'undefined') {
+    openWalletBtn.addEventListener('click', () => {
+      const modal = bootstrap.Modal.getOrCreateInstance(walletModalEl);
+      modal.show();
+      loadWalletDashboard();
+    });
+  }
+
+  if (btnCheckWallet) {
+    btnCheckWallet.addEventListener('click', () => loadWalletDashboard());
+  }
+
+  topupAmtBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      topupAmtBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedModalTopupAmt = parseFloat(btn.dataset.amt) || 50;
+      const display = document.getElementById('selectedTopupDisplay');
+      if (display) display.textContent = `$${selectedModalTopupAmt.toFixed(2)}`;
+    });
+  });
+
+  if (btnExecuteModalTopup) {
+    btnExecuteModalTopup.addEventListener('click', async () => {
+      const phone = phoneLookupInput ? phoneLookupInput.value.trim() : '+61 400 123 456';
+      btnExecuteModalTopup.disabled = true;
+      btnExecuteModalTopup.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Crediting Wallet...';
+
+      try {
+        const res = await fetch('/api/wallet/topup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone: phone,
+            customerName: currentCustomerWallet.name || 'Valued Guest',
+            amount: selectedModalTopupAmt
+          })
+        });
+
+        if (res.ok) {
+          showToast(`Added $${selectedModalTopupAmt.toFixed(2)} to Haven Wallet!`, 'success');
+          loadWalletDashboard();
+        } else {
+          showToast('Failed to top up wallet', 'error');
+        }
+      } catch (err) {
+        showToast('Network error during top-up', 'error');
+      } finally {
+        btnExecuteModalTopup.disabled = false;
+        btnExecuteModalTopup.innerHTML = `<i class="fa-solid fa-plus-circle me-1"></i> Add <span id="selectedTopupDisplay">$${selectedModalTopupAmt.toFixed(2)}</span> to Haven Wallet`;
+      }
+    });
+  }
+
+  async function loadWalletDashboard() {
+    const phone = phoneLookupInput ? phoneLookupInput.value.trim() : '+61 400 123 456';
+    if (!phone) return;
+
+    try {
+      const res = await fetch(`/api/wallet/${encodeURIComponent(phone)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.data) {
+          const d = json.data;
+          currentCustomerWallet.balance = d.walletBalance;
+          currentCustomerWallet.name = d.customerName;
+          currentCustomerWallet.phone = d.customerPhone;
+
+          const balEl = document.getElementById('walletModalBalance');
+          if (balEl) balEl.textContent = `$${d.walletBalance.toFixed(2)}`;
+
+          const nameEl = document.getElementById('walletModalCustName');
+          if (nameEl) nameEl.textContent = d.customerName || 'Valued Guest';
+
+          const phEl = document.getElementById('walletModalCustPhone');
+          if (phEl) phEl.textContent = d.customerPhone;
+
+          const navPill = document.getElementById('navWalletPill');
+          if (navPill) navPill.textContent = `$${d.walletBalance.toFixed(2)}`;
+
+          // Render transaction ledger
+          const tbody = document.getElementById('walletLedgerTbody');
+          if (tbody) {
+            if (!d.recentTransactions || d.recentTransactions.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">No wallet transactions yet. Top up credits above to get started!</td></tr>`;
+            } else {
+              tbody.innerHTML = d.recentTransactions.map(tx => {
+                const isTopup = tx.type === 'TOPUP' || tx.type === 'PROMOTION';
+                const amtClass = isTopup ? 'text-success' : 'text-warning';
+                const sign = isTopup ? '+' : '';
+                const dateStr = tx.createdAt ? new Date(tx.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                return `
+                  <tr>
+                    <td><code>${escapeHtml(tx.transactionRef)}</code></td>
+                    <td><span class="badge ${isTopup ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}">${escapeHtml(tx.type)}</span></td>
+                    <td class="fw-bold ${amtClass}">${sign}$${Math.abs(tx.amount).toFixed(2)}</td>
+                    <td class="text-light">$${tx.balanceAfter.toFixed(2)}</td>
+                    <td class="text-secondary">${escapeHtml(tx.description || '')}</td>
+                    <td class="text-muted">${dateStr}</td>
+                  </tr>
+                `;
+              }).join('');
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Error loading wallet dashboard:', err);
+    }
+  }
+
+  // Load starter wallet for default guest
+  fetchCustomerWallet('+61 400 123 456');
+}
 
 /* ==========================================================================
    GALLERY LIGHTBOX

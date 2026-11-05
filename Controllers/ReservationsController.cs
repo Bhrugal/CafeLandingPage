@@ -79,8 +79,8 @@ public class ReservationsController : ControllerBase
 
             // 3. Insert reservation
             var insertReservationSql = @"
-                INSERT INTO Reservations (ReferenceCode, CustomerId, GuestName, Email, Phone, PartySize, ReservationDate, ReservationTime, SeatingZone, SpecialNotes, Status, CreatedAt)
-                VALUES (@ReferenceCode, @CustomerId, @GuestName, @Email, @Phone, @PartySize, @ReservationDate, @ReservationTime, @SeatingZone, @SpecialNotes, @Status, @CreatedAt);
+                INSERT INTO Reservations (ReferenceCode, CustomerId, GuestName, Email, Phone, PartySize, ReservationDate, ReservationTime, SeatingZone, SpecialNotes, PaymentMethod, PaymentStatus, TotalAmount, Status, CreatedAt)
+                VALUES (@ReferenceCode, @CustomerId, @GuestName, @Email, @Phone, @PartySize, @ReservationDate, @ReservationTime, @SeatingZone, @SpecialNotes, @PaymentMethod, @PaymentStatus, @TotalAmount, @Status, @CreatedAt);
                 SELECT last_insert_rowid();
             ";
 
@@ -96,6 +96,9 @@ public class ReservationsController : ControllerBase
                 ReservationTime = dto.ReservationTime.Trim(),
                 SeatingZone = dto.SeatingZone.Trim(),
                 SpecialNotes = dto.SpecialNotes?.Trim(),
+                PaymentMethod = dto.PaymentMethod,
+                PaymentStatus = "Confirmed",
+                TotalAmount = 0.0,
                 Status = "Confirmed",
                 CreatedAt = now
             });
@@ -114,6 +117,9 @@ public class ReservationsController : ControllerBase
                 ReservationTime = dto.ReservationTime.Trim(),
                 SeatingZone = dto.SeatingZone.Trim(),
                 SpecialNotes = dto.SpecialNotes,
+                PaymentMethod = dto.PaymentMethod,
+                PaymentStatus = "Confirmed",
+                TotalAmount = 0.0m,
                 Status = "Confirmed",
                 CreatedAt = DateTime.Parse(now)
             };

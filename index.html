@@ -22,6 +22,8 @@
 
   <!-- Custom Luxury Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
+  <!-- Stripe.js v3 Gateway -->
+  <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body>
@@ -45,10 +47,17 @@
           <i class="fa-solid fa-moon" id="themeIcon"></i>
         </button>
 
+        <!-- Haven Wallet Trigger Button -->
+        <button id="openWalletBtn" class="cart-toggle-btn me-1" aria-label="Haven Wallet" title="Haven Digital Wallet">
+          <i class="fa-solid fa-wallet text-warning"></i>
+          <span class="d-none d-sm-inline">Wallet</span>
+          <span class="badge bg-warning text-dark ms-1 d-none d-md-inline" id="navWalletPill">$50</span>
+        </button>
+
         <!-- Live Orders Trigger Button -->
-        <button id="openOrdersBtn" class="cart-toggle-btn me-1" aria-label="View Live Orders" title="Database Live Orders">
+        <button id="openOrdersBtn" class="cart-toggle-btn me-1" aria-label="View Live Orders & Bookings" title="Database Live Orders & Bookings">
           <i class="fa-solid fa-receipt"></i>
-          <span class="d-none d-sm-inline">Orders</span>
+          <span class="d-none d-sm-inline">Orders &amp; Bookings</span>
         </button>
 
         <!-- Cart Trigger Button -->
@@ -945,18 +954,23 @@
   </div>
 
   <!-- =========================================================================
-       CHECKOUT MODAL
+       CHECKOUT & TABLE BOOKING MODAL
        ========================================================================= -->
   <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title font-serif fw-bold" id="checkoutModalTitle">Complete Your Order</h5>
+        <div class="modal-header border-bottom border-secondary pb-3">
+          <div>
+            <span class="badge-tag badge-gold mb-1 d-inline-block">
+              <i class="fa-solid fa-shield-halved me-1"></i> Secure Checkout &amp; Booking
+            </span>
+            <h4 class="modal-title font-serif fw-bold" id="checkoutModalTitle">Complete Your Cafe Order &amp; Booking</h4>
+          </div>
           <button type="button" class="btn-close btn-close-modal" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
           <!-- Itemized order review preview -->
-          <div class="mb-3">
+          <div class="mb-4 p-3 rounded border" style="background: var(--bg-card); border-color: var(--border-color) !important;">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <span class="small text-secondary fw-bold text-uppercase" style="letter-spacing: 0.5px;">Order Summary</span>
               <span class="badge-tag badge-gold" id="checkoutDiningBadge">Takeaway</span>
@@ -967,66 +981,290 @@
           </div>
 
           <form id="checkoutForm">
-            <div class="row g-3">
+            <!-- 1. GUEST DETAILS -->
+            <div class="checkout-step-title mb-3">
+              <span class="step-num">1</span>
+              <div>
+                <h6 class="mb-0 fw-bold">Guest &amp; Contact Information</h6>
+                <small class="text-secondary">Used for order tracking, table reservation &amp; digital wallet lookup</small>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
               <div class="col-md-6">
                 <label class="form-label">Full Name *</label>
-                <input type="text" class="form-control" id="orderCustName" placeholder="Your Name" required>
+                <div class="input-icon-wrap">
+                  <i class="fa-regular fa-user"></i>
+                  <input type="text" class="form-control" id="orderCustName" placeholder="e.g. Elena Rostova" required>
+                </div>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Phone / WhatsApp *</label>
-                <input type="tel" class="form-control" id="orderCustPhone" placeholder="+61 400 000 000" required>
+                <label class="form-label">Phone / WhatsApp * <span class="text-muted small">(Auto-loads Wallet)</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-phone"></i>
+                  <input type="tel" class="form-control" id="orderCustPhone" placeholder="+61 400 123 456" required>
+                </div>
               </div>
               <div class="col-12">
                 <label class="form-label">Email Address (Optional for e-Receipt)</label>
-                <input type="email" class="form-control" id="orderCustEmail" placeholder="e.g. yourname@example.com">
-              </div>
-
-              <!-- Dining dynamic field -->
-              <div class="col-12" id="checkoutDiningFieldWrap">
-                <label class="form-label" id="checkoutDiningLabel">Pickup Time Slot</label>
-                <select class="form-select" id="orderPickupTime">
-                  <option value="ASAP (15-20 mins)">ASAP (15-20 mins)</option>
-                  <option value="In 30 minutes">In 30 minutes</option>
-                  <option value="In 45 minutes">In 45 minutes</option>
-                  <option value="In 1 hour">In 1 hour</option>
-                </select>
-                <input type="text" class="form-control d-none" id="orderTableNumber" placeholder="e.g. Table #12 or Indoor Lounge">
-              </div>
-
-              <div class="col-12">
-                <label class="form-label">Special Requests / Barista Notes</label>
-                <input type="text" class="form-control" id="orderNotesInput" placeholder="e.g. Extra hot, napkins, paper cup...">
-              </div>
-
-              <div class="col-12">
-                <label class="form-label">Payment Method</label>
-                <div class="custom-radio-group">
-                  <div class="custom-radio-btn">
-                    <input type="radio" name="payOption" id="payCounter" value="Pay at Pickup Counter" checked>
-                    <label for="payCounter"><i class="fa-solid fa-shop me-1"></i> Pay at Counter</label>
-                  </div>
-                  <div class="custom-radio-btn">
-                    <input type="radio" name="payOption" id="payApple" value="Apple / Google Pay">
-                    <label for="payApple"><i class="fa-brands fa-apple me-1"></i> Digital Wallet</label>
-                  </div>
-                  <div class="custom-radio-btn">
-                    <input type="radio" name="payOption" id="payCard" value="Credit Card">
-                    <label for="payCard"><i class="fa-solid fa-credit-card me-1"></i> Card</label>
-                  </div>
+                <div class="input-icon-wrap">
+                  <i class="fa-regular fa-envelope"></i>
+                  <input type="email" class="form-control" id="orderCustEmail" placeholder="elena@example.com">
                 </div>
               </div>
             </div>
 
+            <!-- 2. DINING & TABLE BOOKING FLOW -->
+            <div class="checkout-step-title mb-3">
+              <span class="step-num">2</span>
+              <div>
+                <h6 class="mb-0 fw-bold">Dining Mode &amp; Table Booking</h6>
+                <small class="text-secondary">Pickup at counter or guarantee a reserved table with your pre-order</small>
+              </div>
+            </div>
+
+            <div class="dining-selector-grid mb-3">
+              <div class="dining-pill-card active" id="pillTakeaway" role="button">
+                <i class="fa-solid fa-bag-shopping fs-4 mb-1"></i>
+                <div class="fw-bold">Takeaway / Counter</div>
+                <small class="text-secondary">Quick pickup counter</small>
+              </div>
+              <div class="dining-pill-card" id="pillDineIn" role="button">
+                <i class="fa-solid fa-chair fs-4 mb-1"></i>
+                <div class="fw-bold">Reserve Table (Dine-In)</div>
+                <small class="text-secondary">Table hold + food pre-ordered</small>
+              </div>
+            </div>
+
+            <!-- Takeaway Pickup Time Slot -->
+            <div id="takeawaySlotWrapper" class="mb-3">
+              <label class="form-label">Pickup Time Slot</label>
+              <select class="form-select" id="orderPickupTime">
+                <option value="ASAP (15-20 mins)">ASAP (15-20 mins) — Fresh Brew</option>
+                <option value="In 30 minutes">In 30 minutes</option>
+                <option value="In 45 minutes">In 45 minutes</option>
+                <option value="In 1 hour">In 1 hour</option>
+              </select>
+            </div>
+
+            <!-- Dine-In Table Booking Form (Collapsible/Dynamic) -->
+            <div id="dineInFieldsWrapper" class="p-3 mb-3 rounded border d-none" style="background: rgba(224, 169, 109, 0.05); border-color: var(--border-color) !important;">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-calendar-check text-warning"></i>
+                <span class="fw-bold small text-warning text-uppercase">Table Reservation Details</span>
+              </div>
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <label class="form-label small">Party Size *</label>
+                  <select class="form-select form-select-sm" id="bookingGuests">
+                    <option value="1">1 Person (Solo Work)</option>
+                    <option value="2" selected>2 Persons (Cozy Table)</option>
+                    <option value="3">3 - 4 Persons</option>
+                    <option value="6">5 - 8 Persons (Group Booth)</option>
+                    <option value="10">8+ Persons (Event Booking)</option>
+                  </select>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small">Reservation Date *</label>
+                  <input type="date" class="form-control form-control-sm" id="bookingDate">
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small">Time Slot *</label>
+                  <select class="form-select form-select-sm" id="bookingTime">
+                    <option value="08:00 AM">08:00 AM (Morning Brew)</option>
+                    <option value="10:00 AM" selected>10:00 AM (Brunch Time)</option>
+                    <option value="12:30 PM">12:30 PM (Lunch Break)</option>
+                    <option value="03:00 PM">03:00 PM (Afternoon Tea)</option>
+                    <option value="05:30 PM">05:30 PM (Sunset Chill)</option>
+                  </select>
+                </div>
+                <div class="col-12 mt-2">
+                  <label class="form-label small">Seating Preference</label>
+                  <select class="form-select form-select-sm" id="bookingZone">
+                    <option value="Indoor Lounge" selected>Indoor Lounge (Cozy &amp; Warm Ambiance)</option>
+                    <option value="Garden Patio">Garden Patio (Fresh Air &amp; Greenery)</option>
+                    <option value="Window Bar">Window Bar (Street View &amp; Natural Light)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Special Requests / Barista Notes</label>
+              <input type="text" class="form-control" id="orderNotesInput" placeholder="e.g. Extra hot milk, sugar on side, quiet table corner...">
+            </div>
+
+            <!-- 3. PAYMENT METHOD SELECTION -->
+            <div class="checkout-step-title mb-3">
+              <span class="step-num">3</span>
+              <div>
+                <h6 class="mb-0 fw-bold">Select Payment &amp; Confirmation Method</h6>
+                <small class="text-secondary">3 flexible payment options supported</small>
+              </div>
+            </div>
+
+            <!-- 3 Payment Option Cards -->
+            <div class="payment-cards-grid mb-3">
+              <!-- Option 1: At Counter -->
+              <div class="payment-method-card active" data-method="Pay at Counter" id="methodCounterCard">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="pay-icon"><i class="fa-solid fa-shop"></i></div>
+                    <div>
+                      <div class="fw-bold">1. At Counter</div>
+                      <small class="text-secondary">Serve &amp; Pay at Counter</small>
+                    </div>
+                  </div>
+                  <span class="badge bg-secondary-subtle text-light border border-secondary small">Pay Later</span>
+                </div>
+                <p class="pay-desc mb-0">
+                  Take order &amp; create booking now as <strong>Pending</strong>. Confirmed when barista serves order and takes payment at counter.
+                </p>
+              </div>
+
+              <!-- Option 2: Haven Wallet -->
+              <div class="payment-method-card" data-method="Haven Wallet" id="methodWalletCard">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="pay-icon"><i class="fa-solid fa-wallet text-warning"></i></div>
+                    <div>
+                      <div class="fw-bold">2. Haven Wallet</div>
+                      <small class="text-secondary">In-App Digital Balance</small>
+                    </div>
+                  </div>
+                  <span class="badge bg-warning-subtle text-warning border border-warning fw-bold" id="checkoutWalletBadge">
+                    Balance: <span id="checkoutWalletBalText">$25.00</span>
+                  </span>
+                </div>
+                <p class="pay-desc mb-0">
+                  Instant 1-click confirmation deducted directly from your customer wallet balance. 0 transaction fees.
+                </p>
+              </div>
+
+              <!-- Option 3: Card Payment Gateway -->
+              <div class="payment-method-card" data-method="Credit Card" id="methodCardCard">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="pay-icon"><i class="fa-solid fa-credit-card text-info"></i></div>
+                    <div>
+                      <div class="fw-bold">3. Card Payment</div>
+                      <small class="text-secondary">Integrated Payment Gateway</small>
+                    </div>
+                  </div>
+                  <span class="badge bg-info-subtle text-info border border-info small">
+                    <i class="fa-solid fa-lock me-1"></i>256-Bit SSL
+                  </span>
+                </div>
+                <p class="pay-desc mb-0">
+                  Pay securely with Visa, MasterCard, or Amex via payment gateway with instant transaction verification.
+                </p>
+              </div>
+            </div>
+
+            <!-- Dynamic Sub-Panel for Option 2: Haven Wallet Details & Top-up -->
+            <div id="walletDetailsPanel" class="p-3 mb-3 rounded border d-none" style="background: var(--bg-card); border-color: var(--border-color) !important;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-solid fa-coins text-warning fs-4"></i>
+                  <div>
+                    <span class="small text-secondary fw-semibold">Available Wallet Credit:</span>
+                    <h5 class="mb-0 fw-bold text-warning" id="panelWalletBalDisplay">$25.00</h5>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-warning" id="refreshWalletBtn" title="Refresh Wallet">
+                  <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+              </div>
+
+              <div id="walletInsufficientWarning" class="alert alert-warning py-2 px-3 small d-none mb-2">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                <strong>Insufficient Balance:</strong> Top up with 1-click below to complete booking:
+              </div>
+
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="small text-secondary fw-semibold">Instant Top-Up:</span>
+                <button type="button" class="btn-topup-pill" data-amount="10">+$10</button>
+                <button type="button" class="btn-topup-pill" data-amount="25">+$25</button>
+                <button type="button" class="btn-topup-pill" data-amount="50">+$50</button>
+                <button type="button" class="btn-topup-pill" data-amount="100">+$100</button>
+                <span id="topupSpinner" class="spinner-border spinner-border-sm text-warning d-none"></span>
+              </div>
+            </div>
+
+            <!-- Dynamic Sub-Panel for Option 3: Card Gateway Form -->
+            <div id="cardGatewayPanel" class="p-3 mb-3 rounded border d-none" style="background: var(--bg-card); border-color: var(--border-color) !important;">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="small fw-bold text-uppercase text-secondary" style="letter-spacing: 0.5px;">
+                  <i class="fa-brands fa-stripe text-info me-1 fs-5"></i> Stripe Payment Gateway <span class="badge bg-primary-subtle text-primary border border-primary ms-1" style="font-size: 0.65rem;">Verified</span>
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-warning" id="fillDemoCardBtn">
+                  <i class="fa-solid fa-bolt me-1"></i> Auto-Fill Test Card
+                </button>
+              </div>
+
+              <!-- Sleek Card Visual Preview -->
+              <div class="luxury-credit-card mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <i class="fa-solid fa-microchip fs-3 text-warning"></i>
+                  <span id="cardBrandLogo" class="fs-4 text-light"><i class="fa-brands fa-cc-visa"></i></span>
+                </div>
+                <div class="card-number-display mb-2" id="cardNumPreview">•••• •••• •••• 4242</div>
+                <div class="d-flex justify-content-between align-items-end text-uppercase small">
+                  <div>
+                    <div class="text-muted" style="font-size: 0.7rem;">Card Holder</div>
+                    <div class="fw-bold" id="cardHolderPreview">VALUED GUEST</div>
+                  </div>
+                  <div>
+                    <div class="text-muted" style="font-size: 0.7rem;">Expires</div>
+                    <div class="fw-bold" id="cardExpiryPreview">12/28</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label small">Cardholder Name *</label>
+                  <input type="text" class="form-control form-control-sm" id="cardHolderInput" placeholder="Name on Card">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small">Card Number *</label>
+                  <input type="text" class="form-control form-control-sm" id="cardNumInput" placeholder="4242 4242 4242 4242" maxlength="19">
+                </div>
+                <div class="col-4">
+                  <label class="form-label small">Expires (MM/YY) *</label>
+                  <input type="text" class="form-control form-control-sm" id="cardExpiryInput" placeholder="12/28" maxlength="5">
+                </div>
+                <div class="col-4">
+                  <label class="form-label small">CVC / CVV *</label>
+                  <input type="password" class="form-control form-control-sm" id="cardCvcInput" placeholder="123" maxlength="4">
+                </div>
+                <div class="col-4">
+                  <label class="form-label small">Postal / ZIP</label>
+                  <input type="text" class="form-control form-control-sm" id="cardZipInput" placeholder="3000">
+                </div>
+                <div class="col-12 mt-2">
+                  <div class="small text-muted d-flex align-items-center gap-1">
+                    <i class="fa-solid fa-lock text-success"></i>
+                    <span>256-bit SSL encrypted &amp; powered by Stripe. Test card: <code>4242 4242 4242 4242</code></span>
+                  </div>
+                  <div id="stripePaymentAlert" class="alert alert-danger py-1 px-2 small d-none mt-2"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price Breakdown Summary -->
             <div class="p-3 my-3 rounded border" style="background: var(--bg-card); border-color: var(--border-color) !important;">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <span class="text-secondary small">Total Payable:</span>
-                <span class="fw-bold text-warning font-serif fs-5" id="checkoutOrderTotal">$0.00</span>
+                <span class="fw-bold text-warning font-serif fs-4" id="checkoutOrderTotal">$0.00</span>
               </div>
-              <small class="text-muted d-block"><i class="fa-solid fa-clock me-1"></i> Freshly prepared by our baristas upon order placement.</small>
+              <small class="text-muted d-block" id="checkoutPaymentNote">
+                <i class="fa-solid fa-info-circle me-1"></i> Option 1 selected: Pay at Counter. Status is Pending; confirmed when served by barista.
+              </small>
             </div>
 
             <button type="submit" class="btn-luxury-gold w-100 py-3" id="submitOrderBtn">
-              <i class="fa-solid fa-circle-check me-1"></i> Confirm & Place Order
+              <i class="fa-solid fa-circle-check me-1"></i> <span id="submitOrderBtnText">Confirm &amp; Place Order (At Counter)</span>
             </button>
           </form>
         </div>
@@ -1054,9 +1292,18 @@
           <button type="button" class="btn-luxury-gold px-4" data-bs-dismiss="modal">
             Awesome, Got It!
           </button>
+          <div class="mt-2">
+            <button type="button" class="btn btn-sm btn-outline-warning px-3" id="viewInDashboardBtn">
+              <i class="fa-solid fa-receipt me-1"></i> View in Live Orders &amp; Bookings Dashboard
+            </button>
+          </div>
+          <button type="button" class="d-none" data-bs-dismiss="modal">
+          </button>
         </div>
       </div>
     </div>
+  </div>
+
   <!-- =========================================================================
        LIVE ORDERS DASHBOARD MODAL (Database View)
        ========================================================================= -->
@@ -1069,7 +1316,7 @@
               <i class="fa-solid fa-database me-1"></i> SQLite Database Persisted
             </span>
             <h4 class="modal-title font-serif fw-bold text-light mb-0" id="liveOrdersModalLabel">
-              Recent Cafe Orders &amp; Customer Records
+              Live Cafe Orders &amp; Table Bookings Dashboard
             </h4>
           </div>
           <div class="d-flex align-items-center gap-2">
@@ -1083,10 +1330,48 @@
         <div class="modal-body p-4">
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
             <p class="text-secondary small mb-0">
-              Live orders stored in backend <code>CafeHaven.db</code>. Baristas can track order status, item lists, and customer profiles in real time.
+              Live orders &amp; table bookings stored in backend <code>CafeHaven.db</code>. Baristas can track payment methods (Counter, Wallet, Card Gateway) and confirm counter orders when served.
             </p>
             <div class="small text-muted">
               API Status: <span class="badge bg-success-subtle text-success border border-success" id="apiStatusBadge">Connected (ASP.NET Core 9)</span>
+            </div>
+          </div>
+
+          <!-- Nav Pills for Orders vs Bookings -->
+          <ul class="nav nav-pills mb-3 border-bottom border-secondary pb-2" id="ordersBookingsTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold px-3 py-2 text-warning" id="tabOrdersBtn" data-bs-toggle="pill" data-bs-target="#tabOrdersPane" type="button" role="tab">
+                <i class="fa-solid fa-mug-hot me-2"></i>Cafe Orders (<span id="ordersCountBadge">0</span>)
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold px-3 py-2 text-secondary" id="tabBookingsBtn" data-bs-toggle="pill" data-bs-target="#tabBookingsPane" type="button" role="tab">
+                <i class="fa-solid fa-chair me-2"></i>Table Bookings &amp; Reservations (<span id="bookingsCountBadge">0</span>)
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="ordersBookingsTabContent">
+            <!-- TAB 1: CAFE ORDERS -->
+            <div class="tab-pane fade show active" id="tabOrdersPane" role="tabpanel">
+
+          <!-- Nav Pills for Orders vs Bookings -->
+          <ul class="nav nav-pills mb-3 border-bottom border-secondary pb-2" id="ordersBookingsTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold px-3 py-2 text-warning" id="tabOrdersBtn" data-bs-toggle="pill" data-bs-target="#tabOrdersPane" type="button" role="tab">
+                <i class="fa-solid fa-mug-hot me-2"></i>Cafe Orders (<span id="ordersCountBadge">0</span>)
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold px-3 py-2 text-secondary" id="tabBookingsBtn" data-bs-toggle="pill" data-bs-target="#tabBookingsPane" type="button" role="tab">
+                <i class="fa-solid fa-chair me-2"></i>Table Bookings &amp; Reservations (<span id="bookingsCountBadge">0</span>)
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="ordersBookingsTabContent">
+            <!-- TAB 1: CAFE ORDERS -->
+            <div class="tab-pane fade show active" id="tabOrdersPane" role="tabpanel">
             </div>
           </div>
 
@@ -1109,12 +1394,13 @@
                 <tr class="text-warning border-bottom border-secondary small text-uppercase" style="letter-spacing: 0.5px;">
                   <th>Order Ref</th>
                   <th>Customer</th>
-                  <th>Dining</th>
-                  <th>Items Ordered</th>
+                  <th>Dining &amp; Booking</th>
+                  <th>Items</th>
                   <th>Total</th>
+                  <th>Payment</th>
                   <th>Status</th>
                   <th>Placed At</th>
-                  <th class="text-end">Update Status</th>
+                  <th class="text-end">Barista Action</th>
                 </tr>
               </thead>
               <tbody id="liveOrdersTbody">
@@ -1124,13 +1410,141 @@
           </div>
         </div>
 
+        <!-- TAB 2: TABLE RESERVATIONS -->
+        <div class="tab-pane fade" id="tabBookingsPane" role="tabpanel">
+          <div id="liveBookingsEmpty" class="text-center py-5 d-none">
+            <i class="fa-solid fa-calendar-xmark fs-1 text-muted mb-3 opacity-50"></i>
+            <h5 class="text-light">No table bookings placed yet</h5>
+            <p class="text-secondary small">Reserve a table using the booking form on the homepage to see reservations saved in SQLite here.</p>
+          </div>
+
+          <div class="table-responsive d-none" id="liveBookingsTableWrapper">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+              <thead>
+                <tr class="text-warning border-bottom border-secondary small text-uppercase" style="letter-spacing: 0.5px;">
+                  <th>Booking Ref</th>
+                  <th>Guest Name</th>
+                  <th>Contact Info</th>
+                  <th>Party Size</th>
+                  <th>Date &amp; Time</th>
+                  <th>Seating Zone</th>
+                  <th>Special Notes</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th>Reserved On</th>
+                </tr>
+              </thead>
+              <tbody id="liveBookingsTbody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
         <div class="modal-footer border-top border-secondary px-4 py-3">
           <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <span class="text-muted small">
-              <i class="fa-solid fa-server me-1"></i> Endpoints: <code>GET /api/orders</code> &bull; <code>PATCH /api/orders/{id}/status</code> &bull; <code>/swagger</code>
+              <i class="fa-solid fa-server me-1"></i> Endpoints: <code>GET /api/orders</code> &bull; <code>GET /api/reservations</code> &bull; <code>POST /api/payments/create-intent (Stripe)</code> &bull; <code>/swagger</code>
             </span>
             <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       HAVEN DIGITAL WALLET MODAL
+       ========================================================================= -->
+  <div class="modal fade" id="walletModal" tabindex="-1" aria-labelledby="walletModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);">
+        <div class="modal-header border-bottom border-secondary pb-3 px-4 pt-4">
+          <div>
+            <span class="badge-tag badge-gold mb-1 d-inline-block">
+              <i class="fa-solid fa-coins me-1"></i> Customer Rewards &amp; Balance
+            </span>
+            <h4 class="modal-title font-serif fw-bold text-light mb-0" id="walletModalLabel">
+              Haven Digital Coffee Wallet
+            </h4>
+          </div>
+          <button type="button" class="btn-close btn-close-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <!-- Lookup Customer by Phone -->
+          <div class="p-3 mb-4 rounded border" style="background: var(--bg-card); border-color: var(--border-color) !important;">
+            <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Customer Phone Number</label>
+            <div class="input-group">
+              <span class="input-group-text bg-dark border-secondary text-warning"><i class="fa-solid fa-phone"></i></span>
+              <input type="tel" class="form-control" id="walletPhoneLookup" placeholder="+61 400 123 456" value="+61 400 123 456">
+              <button class="btn btn-warning fw-bold" id="btnCheckWallet">
+                <i class="fa-solid fa-magnifying-glass me-1"></i> Check Balance
+              </button>
+            </div>
+            <small class="text-secondary mt-1 d-block">Enter your mobile number to view balance, load credits, or view order payments.</small>
+          </div>
+
+          <!-- Customer Wallet Balance Card -->
+          <div class="luxury-credit-card mb-4 text-light">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge-tag badge-gold">Haven Roastery VIP</span>
+              <span class="fs-4 text-warning"><i class="fa-solid fa-mug-hot"></i></span>
+            </div>
+            <div class="text-secondary small mb-1">CURRENT AVAILABLE BALANCE</div>
+            <h2 class="display-5 font-serif fw-bold text-warning mb-3" id="walletModalBalance">$50.00</h2>
+            <div class="d-flex justify-content-between align-items-end small text-uppercase">
+              <div>
+                <div class="text-secondary" style="font-size: 0.72rem;">Customer Name</div>
+                <div class="fw-bold text-light" id="walletModalCustName">Elena Rostova</div>
+              </div>
+              <div>
+                <div class="text-secondary" style="font-size: 0.72rem;">Account Phone</div>
+                <div class="fw-bold text-light" id="walletModalCustPhone">+61 400 123 456</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Top-Up Section -->
+          <div class="p-3 mb-4 rounded border" style="background: var(--bg-card); border-color: var(--border-color) !important;">
+            <h6 class="fw-bold mb-2 text-light">Instant Wallet Top-Up</h6>
+            <p class="text-secondary small mb-3">Add credits to your Haven Wallet for seamless 1-click booking and cafe order checkout.</p>
+            <div class="d-flex gap-2 flex-wrap mb-3">
+              <button type="button" class="btn btn-outline-warning btn-modal-topup" data-amt="10">+$10.00</button>
+              <button type="button" class="btn btn-outline-warning btn-modal-topup" data-amt="25">+$25.00</button>
+              <button type="button" class="btn btn-outline-warning btn-modal-topup active" data-amt="50">+$50.00</button>
+              <button type="button" class="btn btn-outline-warning btn-modal-topup" data-amt="100">+$100.00</button>
+            </div>
+            <button class="btn btn-luxury-gold w-100" id="btnExecuteModalTopup">
+              <i class="fa-solid fa-plus-circle me-1"></i> Add <span id="selectedTopupDisplay">$50.00</span> to Haven Wallet
+            </button>
+          </div>
+
+          <!-- Transaction Ledger History -->
+          <h6 class="fw-bold mb-2 text-light">Recent Wallet Activity &amp; Booking Debits</h6>
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle small mb-0" style="background: transparent;">
+              <thead>
+                <tr class="text-warning border-bottom border-secondary">
+                  <th>Ref</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Balance</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="walletLedgerTbody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top border-secondary px-4 py-3">
+          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>

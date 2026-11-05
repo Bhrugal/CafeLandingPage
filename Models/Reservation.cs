@@ -43,6 +43,16 @@ public class Reservation
     [MaxLength(500)]
     public string? SpecialNotes { get; set; }
 
+    public int? OrderId { get; set; }
+
+    [MaxLength(50)]
+    public string PaymentMethod { get; set; } = "Pay at Pickup Counter";
+
+    [MaxLength(50)]
+    public string PaymentStatus { get; set; } = "Confirmed";
+
+    public decimal TotalAmount { get; set; } = 0;
+
     [MaxLength(30)]
     public string Status { get; set; } = "Confirmed"; // Confirmed, Completed, Cancelled
 

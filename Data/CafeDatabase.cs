@@ -50,9 +50,24 @@ public class CafeDatabase
                 FullName TEXT NOT NULL,
                 Phone TEXT NOT NULL,
                 Email TEXT,
+                WalletBalance REAL NOT NULL DEFAULT 50.0,
                 CreatedAt TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS idx_customers_phone ON Customers(Phone);
+
+            CREATE TABLE IF NOT EXISTS WalletTransactions (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CustomerId INTEGER NOT NULL,
+                TransactionRef TEXT NOT NULL UNIQUE,
+                Type TEXT NOT NULL, -- TOPUP, PAYMENT, REFUND
+                Amount REAL NOT NULL,
+                BalanceAfter REAL NOT NULL,
+                Description TEXT,
+                CreatedAt TEXT NOT NULL,
+                FOREIGN KEY(CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE
+            );
+            CREATE INDEX IF NOT EXISTS idx_wallet_cust ON WalletTransactions(CustomerId);
+            CREATE INDEX IF NOT EXISTS idx_wallet_created ON WalletTransactions(CreatedAt DESC);
 
             CREATE TABLE IF NOT EXISTS Orders (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,6 +79,10 @@ public class CafeDatabase
                 PickupTimeOrTable TEXT NOT NULL,
                 SpecialNotes TEXT,
                 PaymentMethod TEXT NOT NULL,
+                PaymentStatus TEXT NOT NULL DEFAULT 'Pending',
+                TransactionId TEXT,
+                BookingCode TEXT,
+                ReservationId INTEGER,
                 Subtotal REAL NOT NULL,
                 Discount REAL NOT NULL,
                 Tax REAL NOT NULL,
@@ -93,6 +112,7 @@ public class CafeDatabase
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ReferenceCode TEXT NOT NULL UNIQUE,
                 CustomerId INTEGER,
+                OrderId INTEGER,
                 GuestName TEXT NOT NULL,
                 Email TEXT NOT NULL,
                 Phone TEXT NOT NULL,
@@ -101,9 +121,13 @@ public class CafeDatabase
                 ReservationTime TEXT NOT NULL,
                 SeatingZone TEXT NOT NULL,
                 SpecialNotes TEXT,
+                PaymentMethod TEXT NOT NULL DEFAULT 'Pay at Pickup Counter',
+                PaymentStatus TEXT NOT NULL DEFAULT 'Confirmed',
+                TotalAmount REAL NOT NULL DEFAULT 0.0,
                 Status TEXT NOT NULL,
                 CreatedAt TEXT NOT NULL,
-                FOREIGN KEY(CustomerId) REFERENCES Customers(Id) ON DELETE SET NULL
+                FOREIGN KEY(CustomerId) REFERENCES Customers(Id) ON DELETE SET NULL,
+                FOREIGN KEY(OrderId) REFERENCES Orders(Id) ON DELETE SET NULL
             );
             CREATE INDEX IF NOT EXISTS idx_reservations_code ON Reservations(ReferenceCode);
 
@@ -116,16 +140,27 @@ public class CafeDatabase
 
         await connection.ExecuteAsync(sql);
 
+        // Safe migrations for pre-existing tables in CafeHaven.db
+        await EnsureColumnExistsAsync(connection, "Customers", "WalletBalance", "REAL NOT NULL DEFAULT 50.0");
+        await EnsureColumnExistsAsync(connection, "Orders", "PaymentStatus", "TEXT NOT NULL DEFAULT 'Pending'");
+        await EnsureColumnExistsAsync(connection, "Orders", "TransactionId", "TEXT");
+        await EnsureColumnExistsAsync(connection, "Orders", "BookingCode", "TEXT");
+        await EnsureColumnExistsAsync(connection, "Orders", "ReservationId", "INTEGER");
+        await EnsureColumnExistsAsync(connection, "Reservations", "OrderId", "INTEGER");
+        await EnsureColumnExistsAsync(connection, "Reservations", "PaymentMethod", "TEXT NOT NULL DEFAULT 'Pay at Pickup Counter'");
+        await EnsureColumnExistsAsync(connection, "Reservations", "PaymentStatus", "TEXT NOT NULL DEFAULT 'Confirmed'");
+        await EnsureColumnExistsAsync(connection, "Reservations", "TotalAmount", "REAL NOT NULL DEFAULT 0.0");
+
         // Check if database needs sample seed data
         var customerCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Customers;");
         if (customerCount == 0)
         {
             var now = DateTime.UtcNow.ToString("o");
 
-            // Insert sample customer
+            // Insert sample customer with wallet balance
             var insertCustomerSql = @"
-                INSERT INTO Customers (FullName, Phone, Email, CreatedAt)
-                VALUES (@FullName, @Phone, @Email, @CreatedAt);
+                INSERT INTO Customers (FullName, Phone, Email, WalletBalance, CreatedAt)
+                VALUES (@FullName, @Phone, @Email, @WalletBalance, @CreatedAt);
                 SELECT last_insert_rowid();
             ";
 
@@ -134,13 +169,30 @@ public class CafeDatabase
                 FullName = "Elena Rostova",
                 Phone = "+61 400 123 456",
                 Email = "elena.rostova@example.com",
+                WalletBalance = 75.00,
+                CreatedAt = now
+            });
+
+            // Seed initial welcome bonus transaction
+            var insertTxSql = @"
+                INSERT INTO WalletTransactions (CustomerId, TransactionRef, Type, Amount, BalanceAfter, Description, CreatedAt)
+                VALUES (@CustomerId, @TransactionRef, @Type, @Amount, @BalanceAfter, @Description, @CreatedAt);
+            ";
+            await connection.ExecuteAsync(insertTxSql, new
+            {
+                CustomerId = customerId,
+                TransactionRef = "TXN-TOP-1001",
+                Type = "TOPUP",
+                Amount = 75.00,
+                BalanceAfter = 75.00,
+                Description = "Welcome VIP bonus & Coffee Club credit",
                 CreatedAt = now
             });
 
             // Insert sample order
             var insertOrderSql = @"
-                INSERT INTO Orders (OrderReference, CustomerId, CustomerName, CustomerPhone, DiningOption, PickupTimeOrTable, SpecialNotes, PaymentMethod, Subtotal, Discount, Tax, TotalAmount, Status, CreatedAt)
-                VALUES (@OrderReference, @CustomerId, @CustomerName, @CustomerPhone, @DiningOption, @PickupTimeOrTable, @SpecialNotes, @PaymentMethod, @Subtotal, @Discount, @Tax, @TotalAmount, @Status, @CreatedAt);
+                INSERT INTO Orders (OrderReference, CustomerId, CustomerName, CustomerPhone, DiningOption, PickupTimeOrTable, SpecialNotes, PaymentMethod, PaymentStatus, TransactionId, Subtotal, Discount, Tax, TotalAmount, Status, CreatedAt)
+                VALUES (@OrderReference, @CustomerId, @CustomerName, @CustomerPhone, @DiningOption, @PickupTimeOrTable, @SpecialNotes, @PaymentMethod, @PaymentStatus, @TransactionId, @Subtotal, @Discount, @Tax, @TotalAmount, @Status, @CreatedAt);
                 SELECT last_insert_rowid();
             ";
 
@@ -153,12 +205,14 @@ public class CafeDatabase
                 DiningOption = "takeaway",
                 PickupTimeOrTable = "ASAP (15-20 mins)",
                 SpecialNotes = "Extra hot with cinnamon dust",
-                PaymentMethod = "Pay at Pickup Counter",
+                PaymentMethod = "Pay at Counter",
+                PaymentStatus = "Unpaid (At Counter)",
+                TransactionId = (string?)null,
                 Subtotal = 10.30,
                 Discount = 1.03,
                 Tax = 0.46,
                 TotalAmount = 9.73,
-                Status = "Brewing",
+                Status = "Pending",
                 CreatedAt = now
             });
 
@@ -196,14 +250,15 @@ public class CafeDatabase
 
             // Insert sample reservation
             var insertResSql = @"
-                INSERT INTO Reservations (ReferenceCode, CustomerId, GuestName, Email, Phone, PartySize, ReservationDate, ReservationTime, SeatingZone, SpecialNotes, Status, CreatedAt)
-                VALUES (@ReferenceCode, @CustomerId, @GuestName, @Email, @Phone, @PartySize, @ReservationDate, @ReservationTime, @SeatingZone, @SpecialNotes, @Status, @CreatedAt);
+                INSERT INTO Reservations (ReferenceCode, CustomerId, OrderId, GuestName, Email, Phone, PartySize, ReservationDate, ReservationTime, SeatingZone, SpecialNotes, PaymentMethod, PaymentStatus, TotalAmount, Status, CreatedAt)
+                VALUES (@ReferenceCode, @CustomerId, @OrderId, @GuestName, @Email, @Phone, @PartySize, @ReservationDate, @ReservationTime, @SeatingZone, @SpecialNotes, @PaymentMethod, @PaymentStatus, @TotalAmount, @Status, @CreatedAt);
             ";
 
             await connection.ExecuteAsync(insertResSql, new
             {
                 ReferenceCode = "RES-8392",
                 CustomerId = customerId,
+                OrderId = (int?)null,
                 GuestName = "Elena Rostova",
                 Email = "elena.rostova@example.com",
                 Phone = "+61 400 123 456",
@@ -212,11 +267,42 @@ public class CafeDatabase
                 ReservationTime = "10:00 AM",
                 SeatingZone = "Window Bar",
                 SpecialNotes = "Quiet area preferred",
+                PaymentMethod = "Pay at Pickup Counter",
+                PaymentStatus = "Confirmed",
+                TotalAmount = 0.0,
                 Status = "Confirmed",
                 CreatedAt = now
             });
 
             _logger.LogInformation("Cafe Haven SQLite database initialized and seeded successfully.");
+        }
+    }
+
+    private static async Task EnsureColumnExistsAsync(IDbConnection connection, string tableName, string columnName, string columnDefinition)
+    {
+        try
+        {
+            var columns = await connection.QueryAsync<dynamic>($"PRAGMA table_info({tableName});");
+            bool exists = false;
+            foreach (var col in columns)
+            {
+                IDictionary<string, object> row = (IDictionary<string, object>)col;
+                if (row.TryGetValue("name", out var nameVal) && 
+                    string.Equals(nameVal?.ToString(), columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists)
+            {
+                await connection.ExecuteAsync($"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition};");
+            }
+        }
+        catch
+        {
+            // Column may already exist or table created with it; safe to continue
         }
     }
 }

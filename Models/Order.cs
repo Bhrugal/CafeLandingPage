@@ -48,6 +48,17 @@ public class Order
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount { get; set; }
 
+    [MaxLength(50)]
+    public string PaymentStatus { get; set; } = "Pending"; // Unpaid (At Counter), Paid (Wallet), Paid (Card)
+
+    [MaxLength(100)]
+    public string? TransactionId { get; set; }
+
+    [MaxLength(50)]
+    public string? BookingCode { get; set; } // Reference to associated table reservation if booked together
+
+    public int? ReservationId { get; set; }
+
     [MaxLength(30)]
     public string Status { get; set; } = "Pending"; // Pending, Brewing, Ready, Completed, Cancelled
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using CafeLandingPage.Data;
 using CafeLandingPage.DTOs;
+using CafeLandingPage.Models;
 
 namespace CafeLandingPage.Controllers;
 
@@ -46,12 +47,12 @@ public class NewsletterController : ControllerBase
     }
 
     [HttpGet("subscribers")]
-    public async Task<ActionResult<ApiResponse>> GetAllSubscribers()
+    public async Task<ActionResult<ApiResponse<IEnumerable<NewsletterSubscriber>>>> GetAllSubscribers()
     {
         using var connection = _database.CreateConnection();
-        var subscribers = await connection.QueryAsync(
+        var subscribers = await connection.QueryAsync<NewsletterSubscriber>(
             "SELECT * FROM NewsletterSubscribers ORDER BY SubscribedAt DESC;");
 
-        return Ok(ApiResponse.SuccessResult("Subscribers retrieved", subscribers));
+        return Ok(ApiResponse<IEnumerable<NewsletterSubscriber>>.Ok(subscribers, "Subscribers retrieved"));
     }
 }

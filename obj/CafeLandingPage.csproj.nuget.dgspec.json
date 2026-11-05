@@ -25,7 +25,8 @@
           "net9.0"
         ],
         "sources": {
-          "C:\\Users\\bhrug\\.nuget\\packages\\": {}
+          "C:\\Users\\bhrug\\.nuget\\packages": {},
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
@@ -34,6 +35,9 @@
           }
         },
         "warningProperties": {
+          "noWarn": [
+            "NU1900"
+          ],
           "warnAsError": [
             "NU1605"
           ]
@@ -56,6 +60,10 @@
             "Microsoft.Data.Sqlite": {
               "target": "Package",
               "version": "[9.0.2, )"
+            },
+            "Stripe.net": {
+              "target": "Package",
+              "version": "[52.1.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
